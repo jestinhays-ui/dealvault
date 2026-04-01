@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DealVault · RE Investment Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090e1a;--bg1:#0d1525;--bg2:#111d32;--bg3:#172440;--bg4:#1e2e4e;
+  --b:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.11);--b3:rgba(255,255,255,0.18);
+  --t1:#e0eaff;--t2:#8096be;--t3:#415070;
+  --gold:#f5a623;--gold2:rgba(245,166,35,0.15);--gold3:rgba(245,166,35,0.07);
+  --ok:#1ec88a;--ok2:rgba(30,200,138,0.13);
+  --warn:#f0c040;--warn2:rgba(240,192,64,0.13);
+  --bad:#ff4d5e;--bad2:rgba(255,77,94,0.13);
+  --info:#4d8ef5;--info2:rgba(77,142,245,0.13);
+  --purple:#a78af5;--purple2:rgba(167,138,245,0.13);
+  --r:8px;--r2:12px;--r3:16px;
+  --mono:'JetBrains Mono',monospace;
+  --head:'Barlow Condensed',sans-serif;
+  --body:'Barlow',sans-serif;
+  --sh:0 4px 28px rgba(0,0,0,0.45);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--body);font-size:14px;line-height:1.5;overflow-x:hidden}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg1)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+
+/* ─── NAV ─── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(9,14,26,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--b);height:56px;display:flex;align-items:center;padding:0 18px;gap:8px}
+.logo{font-family:var(--head);font-size:22px;font-weight:700;letter-spacing:.5px;white-space:nowrap;margin-right:6px}
+.logo span{color:var(--gold)}
+.nav-sep{width:1px;height:22px;background:var(--b2);flex-shrink:0;margin:0 4px}
+.nb{background:none;border:none;color:var(--t2);font-family:var(--body);font-size:13px;font-weight:500;padding:6px 10px;border-radius:var(--r);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.nb:hover{color:var(--t1);background:var(--bg3)}
+.nb.active{color:var(--gold);background:var(--gold3)}
+.nc{background:var(--bg4);color:var(--t3);font-size:10px;font-family:var(--mono);padding:1px 5px;border-radius:20px;min-width:16px;text-align:center}
+.nc.pulse{background:var(--purple2);color:var(--purple)}
+.nav-r{margin-left:auto;display:flex;gap:7px;align-items:center}
+.pipeline-bar{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--t3);margin:0 4px}
+.pipe-step{padding:2px 8px;border-radius:20px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid var(--b)}
+.pipe-step:hover{color:var(--t1);border-color:var(--b2)}
+.pipe-step.active{color:var(--gold);border-color:var(--gold);background:var(--gold3)}
+.pipe-arrow{color:var(--t3);font-size:9px}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r);font-family:var(--body);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none;white-space:nowrap}
+.btn-gold{background:var(--gold);color:#090e1a;font-weight:600}
+.btn-gold:hover{background:#ffb840;transform:translateY(-1px);box-shadow:0 4px 12px rgba(245,166,35,0.3)}
+.btn-ghost{background:none;border:1px solid var(--b2);color:var(--t2)}
+.btn-ghost:hover{border-color:var(--b3);color:var(--t1);background:var(--bg3)}
+.btn-danger{background:none;border:1px solid rgba(255,77,94,0.25);color:var(--bad)}
+.btn-danger:hover{background:var(--bad2);border-color:var(--bad)}
+.btn-purple{background:var(--purple2);border:1px solid rgba(167,138,245,0.3);color:var(--purple)}
+.btn-purple:hover{background:rgba(167,138,245,0.2)}
+.btn-ok{background:var(--ok2);border:1px solid rgba(30,200,138,0.25);color:var(--ok)}
+.btn-sm{padding:4px 9px;font-size:12px}
+
+/* ─── LAYOUT ─── */
+.main{padding-top:56px;min-height:100vh}
+.page{padding:20px;max-width:1400px;margin:0 auto}
+.spin{width:36px;height:36px;border:2px solid var(--bg3);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:70vh;gap:14px;color:var(--t3);font-family:var(--head);font-size:18px;letter-spacing:1px}
+
+/* ─── PAGE HEADER ─── */
+.ph{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.ph h1{font-family:var(--head);font-size:30px;font-weight:700;letter-spacing:.5px}
+.ph h1 span{color:var(--gold)}
+.ph h1 span.purple{color:var(--purple)}
+.ph h1 span.ok{color:var(--ok)}
+
+/* ─── STATS BAR ─── */
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:8px;margin-bottom:16px}
+.sc{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r);padding:10px 13px}
+.sc-l{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px}
+.sc-v{font-family:var(--mono);font-size:16px;font-weight:500}
+
+/* ─── PIPELINE KANBAN ─── */
+.pipeline-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:20px}
+.pipe-col{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r2);overflow:hidden}
+.pipe-col-hdr{padding:10px 14px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:8px}
+.pipe-col-title{font-family:var(--head);font-size:15px;font-weight:700;letter-spacing:.3px}
+.pipe-col-count{font-size:10px;font-family:var(--mono);padding:1px 6px;border-radius:20px;background:var(--bg3);color:var(--t3)}
+.pipe-card{padding:11px 13px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .12s}
+.pipe-card:last-child{border:none}
+.pipe-card:hover{background:var(--bg2)}
+.pipe-card-addr{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:3px}
+.pipe-card-meta{font-size:11px;color:var(--t3)}
+.pipe-card-price{font-family:var(--mono);font-size:13px;font-weight:500;margin-top:4px}
+.pipe-card-score{display:flex;align-items:center;gap:6px;margin-top:5px}
+.pipe-score-bar{flex:1;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.pipe-score-fill{height:100%;border-radius:2px}
+
+/* ─── FILTERS ─── */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.fl{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
+.fb{background:none;border:1px solid var(--b);color:var(--t3);font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px;cursor:pointer;transition:all .15s;font-family:var(--body)}
+.fb:hover{border-color:var(--b2);color:var(--t2)}
+.fb.on{border-color:var(--gold);color:var(--gold);background:var(--gold3)}
+.sw{position:relative;min-width:170px;max-width:260px}
+.sw input{width:100%;background:var(--bg2);border:1px solid var(--b);color:var(--t1);padding:6px 9px 6px 27px;border-radius:var(--r);font-family:var(--body);font-size:12px;outline:none;transition:border .15s}
+.sw input:focus{border-color:var(--b2)}
+.sw input::placeholder{color:var(--t3)}
+.sw-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:12px;pointer-events:none}
+.sort-sel{background:var(--bg2);border:1px solid var(--b);color:var(--t2);padding:5px 8px;border-radius:var(--r);font-family:var(--body);font-size:12px;cursor:pointer;outline:none}
+
+/* ─── PROPERTY GRID ─── */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:13px}
+.empty{text-align:center;padding:70px 20px;color:var(--t3)}
+.empty .ei{font-size:44px;margin-bottom:14px;opacity:.3}
+.empty h3{font-family:var(--head);font-size:22px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.empty p{font-size:13px;max-width:300px;margin:0 auto 18px;line-height:1.6}
+
+/* ─── PROPERTY CARD ─── */
+.pcard{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r2);overflow:hidden;transition:all .18s;position:relative;cursor:pointer}
+.pcard:hover{border-color:var(--b2);transform:translateY(-2px);box-shadow:var(--sh)}
+.pcard.cmp{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+.ctop{padding:13px 15px 11px;border-bottom:1px solid var(--b)}
+.cbadges{display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap}
+.bg{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.3px;font-family:var(--head);text-transform:uppercase}
+.bg-strat{background:var(--info2);color:var(--info)}
+.bg-uploaded{background:var(--purple2);color:var(--purple)}
+.bg-prospect{background:rgba(167,138,245,0.15);color:#c4aff8}
+.bg-analyzing{background:var(--warn2);color:var(--warn)}
+.bg-offer{background:rgba(245,166,35,0.15);color:var(--gold)}
+.bg-contract{background:var(--info2);color:var(--info)}
+.bg-deal{background:var(--ok2);color:var(--ok)}
+.bg-monitoring{background:var(--ok2);color:var(--ok)}
+.bg-archived{background:var(--bg3);color:var(--t3)}
+.bg-src{background:var(--bg3);color:var(--t3)}
+.cadr{font-family:var(--head);font-size:18px;font-weight:700;color:var(--t1);line-height:1.2;margin-bottom:2px}
+.cmeta{font-size:11px;color:var(--t3);line-height:1.5}
+.cprice{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--t1);margin-top:6px}
+.cprice span{font-size:11px;color:var(--t3);font-weight:400}
+.ckpis{padding:10px 15px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kc{text-align:center}
+.klbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:2px}
+.kval{font-family:var(--mono);font-size:13px;font-weight:500}
+.kval.ok{color:var(--ok)}.kval.warn{color:var(--warn)}.kval.bad{color:var(--bad)}.kval.n{color:var(--t1)}
+.cscore{padding:8px 15px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--b)}
+.cstk{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.csfill{height:100%;border-radius:2px;transition:width .4s}
+.csnum{font-family:var(--mono);font-size:12px;font-weight:600;min-width:28px;text-align:right}
+.csverd{font-size:11px;font-weight:700;font-family:var(--head)}
+.cacts{padding:8px 15px;display:flex;gap:5px;border-top:1px solid var(--b)}
+.cacts .btn{flex:1;justify-content:center;font-size:11px;padding:5px 7px}
+.ctog{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:4px;border:1.5px solid var(--b2);background:rgba(0,0,0,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s;z-index:2;color:var(--t3)}
+.ctog:hover{border-color:var(--gold);color:var(--gold)}
+.ctog.on{background:var(--gold);border-color:var(--gold);color:#090e1a;font-weight:700}
+.ai-badge{position:absolute;bottom:8px;right:8px;background:var(--purple2);border:1px solid rgba(167,138,245,.3);color:var(--purple);font-size:9px;font-family:var(--head);font-weight:700;padding:2px 6px;border-radius:20px;pointer-events:none}
+
+/* ─── DETAIL ─── */
+.back-btn{background:none;border:none;color:var(--t3);font-size:13px;font-family:var(--body);cursor:pointer;display:flex;align-items:center;gap:5px;padding:0 0 8px;transition:color .15s}
+.back-btn:hover{color:var(--t1)}
+.dtitle{font-family:var(--head);font-size:32px;font-weight:700;line-height:1.2}
+.dmeta{font-size:13px;color:var(--t2);margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dacts{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--b);margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{background:none;border:none;color:var(--t3);font-family:var(--body);font-size:13px;font-weight:500;padding:9px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all .15s}
+.tab:hover{color:var(--t2)}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ─── KPI CARDS ─── */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:16px}
+.kcard{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r);padding:12px 14px}
+.kcard-lbl{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.kcard-val{font-family:var(--mono);font-size:20px;font-weight:500;line-height:1.2}
+.kcard-sub{font-size:11px;color:var(--t3);margin-top:3px}
+.kcard-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:7px;overflow:hidden}
+.kcard-bar-fill{height:100%;border-radius:2px;opacity:.7}
+
+/* ─── SCORE CARD ─── */
+.scard{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r2);padding:18px;margin-bottom:16px;display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
+.sbig{text-align:center;min-width:100px}
+.sbig-num{font-family:var(--mono);font-size:56px;font-weight:500;line-height:1}
+.sbig-lbl{font-size:11px;color:var(--t3);margin-top:2px}
+.sbig-verd{font-family:var(--head);font-size:14px;font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.sbdown{flex:1;min-width:200px}
+.sbdown-title{font-size:10px;color:var(--t3);margin-bottom:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.sbrow{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.sbrow-lbl{font-size:12px;color:var(--t2);min-width:135px}
+.sbrow-trk{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.sbrow-fill{height:100%;border-radius:2px}
+.sbrow-val{font-family:var(--mono);font-size:11px;min-width:48px;text-align:right}
+
+/* ─── WATERFALL ─── */
+.wf{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r2);overflow:hidden;margin-bottom:13px}
+.wfr{display:flex;align-items:center;padding:9px 13px;border-bottom:1px solid var(--b);transition:background .1s;gap:7px}
+.wfr:last-child{border:none}
+.wfr:hover{background:var(--bg2)}
+.wfr.tot{background:var(--bg2)}
+.wfl{flex:1;font-size:13px;color:var(--t2)}
+.wfl.ind{padding-left:13px;font-size:12px;color:var(--t3)}
+.wfl.str{color:var(--t1);font-weight:600}
+.wfv{font-family:var(--mono);font-size:13px;font-weight:500;min-width:105px;text-align:right}
+.wfv.ok{color:var(--ok)}.wfv.bad{color:var(--bad)}.wfv.n{color:var(--t1)}.wfv.dim{color:var(--t3)}
+
+/* ─── BRRRR ─── */
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:9px;margin-bottom:13px}
+.bcard{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r);padding:12px}
+.bcard h4{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:6px}
+.bcard .bv{font-family:var(--mono);font-size:19px;font-weight:500}
+.bcard .bs{font-size:11px;color:var(--t3);margin-top:3px}
+.bres{padding:11px 14px;border-radius:var(--r);margin-bottom:13px;display:flex;align-items:flex-start;gap:9px;font-size:13px;line-height:1.5}
+.bres.ok{background:var(--ok2);border:1px solid rgba(30,200,138,.25)}
+.bres.warn{background:var(--warn2);border:1px solid rgba(240,192,64,.25)}
+.bres.bad{background:var(--bad2);border:1px solid rgba(255,77,94,.25)}
+
+/* ─── STRESS TEST ─── */
+.sctrl{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r2);padding:16px;margin-bottom:13px}
+.sctrl h3{font-family:var(--head);font-size:17px;font-weight:600;margin-bottom:13px}
+.sr{display:grid;grid-template-columns:170px 1fr 60px;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--b)}
+.sr:last-child{border:none}
+.sr-lbl{font-size:13px;color:var(--t2)}
+.sr input[type=range]{width:100%;accent-color:var(--gold);cursor:pointer;height:4px}
+.sr-val{font-family:var(--mono);font-size:12px;font-weight:500;text-align:right;color:var(--t1)}
+.presets{display:flex;gap:5px;flex-wrap:wrap;margin-top:13px}
+.preset{background:var(--bg3);border:1px solid var(--b);color:var(--t2);font-size:11px;padding:4px 9px;border-radius:20px;cursor:pointer;font-family:var(--body);transition:all .15s}
+.preset:hover{border-color:var(--b2);color:var(--t1)}
+
+/* ─── HOLD TABLE ─── */
+.htbl{width:100%;border-collapse:collapse;font-size:12px}
+.htbl th{text-align:left;padding:8px 10px;color:var(--t3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--b)}
+.htbl td{padding:8px 10px;border-bottom:1px solid var(--b);font-family:var(--mono)}
+.htbl tr:hover td{background:var(--bg2)}
+.htbl tr:last-child td{border:none}
+.htbl .hl td{background:rgba(245,166,35,.04)}
+
+/* ─── DD ─── */
+.ddsec{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r2);padding:16px;margin-bottom:11px}
+.ddsec h3{font-family:var(--head);font-size:15px;font-weight:600;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between}
+.ddi{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--b);cursor:pointer;transition:opacity .1s}
+.ddi:last-child{border:none}
+.ddi:hover{opacity:.85}
+.ddcb{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--b2);background:var(--bg2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .15s}
+.ddcb.chk{background:var(--ok);border-color:var(--ok);color:#090e1a;font-weight:700}
+.ddt{flex:1;font-size:12px;color:var(--t2);line-height:1.4}
+.ddt.chk{color:var(--t3);text-decoration:line-through}
+.ddsev{font-size:9px;padding:1px 5px;border-radius:3px;font-family:var(--head);font-weight:700;flex-shrink:0}
+.sev-h{background:var(--bad2);color:var(--bad)}.sev-m{background:var(--warn2);color:var(--warn)}.sev-l{background:var(--bg3);color:var(--t3)}
+.ddprog{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:14px}
+.ddpfill{height:100%;background:var(--ok);border-radius:3px;transition:width .3s}
+
+/* ─── EXIT ─── */
+.egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:11px}
+.ec{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r2);padding:15px}
+.ec h3{font-family:var(--head);font-size:16px;font-weight:600;margin-bottom:10px}
+.ei{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--b);font-size:12px}
+.ei:last-child{border:none}
+.ek{color:var(--t3);min-width:68px;font-weight:500;flex-shrink:0}
+.ev{color:var(--t2);flex:1;line-height:1.4}
+
+/* ─── COMPARE ─── */
+.csela{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r2);padding:14px;margin-bottom:16px}
+.csela h3{font-family:var(--head);font-size:16px;font-weight:600;margin-bottom:10px}
+.cselg{display:flex;flex-wrap:wrap;gap:6px}
+.cselbtn{background:var(--bg3);border:1px solid var(--b);color:var(--t2);font-size:12px;padding:5px 10px;border-radius:var(--r);cursor:pointer;transition:all .15s;font-family:var(--body)}
+.cselbtn:hover{border-color:var(--b2);color:var(--t1)}
+.cselbtn.on{border-color:var(--gold);color:var(--gold);background:var(--gold3)}
+.ctblwrap{overflow-x:auto;border-radius:var(--r2)}
+.ctbl{width:100%;border-collapse:collapse;min-width:480px}
+.ctbl th,.ctbl td{padding:8px 12px;border:1px solid var(--b);text-align:center;font-size:12px}
+.ctbl th{background:var(--bg2);font-family:var(--head);font-size:12px;font-weight:600;letter-spacing:.3px;color:var(--t2)}
+.ctbl .rl{background:var(--bg2);text-align:left;color:var(--t2);font-weight:500;width:145px}
+.ctbl .secrow td{background:var(--bg3);color:var(--t3);font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;padding:5px 12px;text-align:left}
+.ctbl .best{color:var(--ok);font-weight:600}
+
+/* ─── TOOLS ─── */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:13px}
+.tcard{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r2);padding:17px}
+.tcard h3{font-family:var(--head);font-size:18px;font-weight:600;margin-bottom:3px}
+.tdesc{font-size:12px;color:var(--t3);margin-bottom:13px}
+.tr{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--b)}
+.tr:last-child{border:none}
+.trl{flex:1;font-size:13px;color:var(--t2)}
+.trv{font-family:var(--mono);font-size:14px;font-weight:500;min-width:95px;text-align:right}
+.tverdict{padding:8px 13px;border-radius:var(--r);font-size:13px;font-weight:500;margin-top:10px;text-align:center}
+.tv-ok{background:var(--ok2);color:var(--ok)}.tv-warn{background:var(--warn2);color:var(--warn)}.tv-bad{background:var(--bad2);color:var(--bad)}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin-bottom:9px}
+.ri{background:var(--bg2);border-radius:var(--r);padding:9px 11px}
+.ri-name{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.ri-val{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--gold)}
+.ri-sub{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* ─── OFFER LAB ─── */
+.offer-flow{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:18px}
+.offer-step{background:var(--bg1);border:1px solid var(--b);border-radius:var(--r2);padding:16px;position:relative;overflow:hidden}
+.offer-step::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.offer-step.step-1::before{background:var(--purple)}
+.offer-step.step-2::before{background:var(--info)}
+.offer-step.step-3::before{background:var(--warn)}
+.offer-step.step-4::before{background:var(--gold)}
+.offer-step.step-5::before{background:var(--ok)}
+.offer-step-num{font-family:var(--mono);font-size:11px;color:var(--t3);font-weight:600;margin-bottom:5px}
+.offer-step h3{font-family:var(--head);font-size:17px;font-weight:700;margin-bottom:8px}
+.offer-variants{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-top:10px}
+.offer-var{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r);padding:11px 13px}
+.offer-var-title{font-family:var(--head);font-size:14px;font-weight:600;margin-bottom:5px}
+.offer-var-body{font-size:12px;color:var(--t2);line-height:1.5}
+.letter-preview{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--r2);padding:20px 24px;font-size:13px;line-height:1.8;color:var(--t2);font-family:var(--body);max-height:500px;overflow-y:auto}
+.letter-preview .lh{font-size:12px;color:var(--t3);margin-bottom:16px}
+.letter-preview .lb{color:var(--t1)}
+.letter-preview .lsig{margin-top:20px;color:var(--t2)}
+.letter-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.ltab{background:var(--bg2);border:1px solid var(--b);color:var(--t3);font-size:12px;padding:5px 11px;border-radius:20px;cursor:pointer;font-family:var(--body);transition:all .15s}
+.ltab:hover{color:var(--t2);border-color:var(--b2)}
+.ltab.on{background:var(--gold3);border-color:var(--gold);color:var(--gold)}
+.copy-btn{background:var(--bg3);border:1px solid var(--b);color:var(--t2);font-size:11px;padding:4px 9px;border-radius:var(--r);cursor:pointer;float:right;font-family:var(--body);transition:all .15s}
+.copy-btn:hover{color:var(--t1);border-color:var(--b2)}
+
+/* ─── MODAL ─── */
+.mover{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px}
+.mbox{background:var(--bg1);border:1px solid var(--b2);border-radius:var(--r3);width:100%;max-width:860px;margin:auto;box-shadow:var(--sh);animation:mIn .18s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.mhdr{padding:17px 22px 13px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:10px}
+.mhdr h2{font-family:var(--head);font-size:22px;font-weight:700;flex:1}
+.mbody{padding:17px 22px;display:grid;grid-template-columns:1fr 1fr;gap:0 20px;max-height:72vh;overflow-y:auto}
+.fsec{grid-column:1/-1;margin:14px 0 5px;padding-bottom:5px;border-bottom:1px solid var(--b)}
+.fsec:first-child{margin-top:0}
+.fsec-title{font-family:var(--head);font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px;text-transform:uppercase}
+.fg{margin-bottom:9px}
+.fg.full{grid-column:1/-1}
+.flbl{display:block;font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.fi,.fsel,.fta{width:100%;background:var(--bg3);border:1px solid var(--b);color:var(--t1);padding:7px 10px;border-radius:var(--r);font-family:var(--body);font-size:13px;outline:none;transition:border .15s}
+.fi:focus,.fsel:focus,.fta:focus{border-color:var(--gold)}
+.fi::placeholder,.fta::placeholder{color:var(--t3)}
+.fsel option{background:var(--bg2)}
+.fta{resize:vertical;min-height:68px}
+.fhint{font-size:10px;color:var(--t3);margin-top:3px}
+.flive{background:var(--bg2);border-radius:var(--r);padding:11px 13px;margin-top:12px;grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:7px;border:1px solid var(--b)}
+.fli-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.fli-val{font-family:var(--mono);font-size:14px;font-weight:500}
+.mfoot{padding:13px 22px;border-top:1px solid var(--b);display:flex;justify-content:flex-end;gap:7px}
+
+/* ─── AI IMPORT MODAL ─── */
+.ai-import-wrap{padding:20px;display:flex;flex-direction:column;gap:14px}
+.ai-url-row{display:flex;gap:8px}
+.ai-url-row .fi{flex:1;font-size:14px;padding:10px 12px}
+.ai-status{padding:12px 15px;border-radius:var(--r);font-size:13px;display:flex;align-items:center;gap:10px}
+.ai-status.thinking{background:var(--purple2);border:1px solid rgba(167,138,245,.3);color:var(--purple)}
+.ai-status.done{background:var(--ok2);border:1px solid rgba(30,200,138,.25);color:var(--ok)}
+.ai-status.error{background:var(--bad2);border:1px solid rgba(255,77,94,.25);color:var(--bad)}
+.ai-fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ai-field{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r);padding:9px 11px}
+.ai-field-key{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.ai-field-val{font-size:13px;color:var(--t1);font-weight:500}
+.ai-notes{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r);padding:11px 13px;font-size:12px;color:var(--t2);line-height:1.6}
+.img-drop{border:2px dashed var(--b2);border-radius:var(--r2);padding:30px;text-align:center;cursor:pointer;transition:all .2s}
+.img-drop:hover{border-color:var(--gold);background:var(--gold3)}
+.img-drop-icon{font-size:28px;opacity:.4;margin-bottom:8px}
+.img-drop-text{font-size:13px;color:var(--t3)}
+.img-drop-text span{color:var(--gold);cursor:pointer}
+.img-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.img-thumb{width:80px;height:60px;object-fit:cover;border-radius:var(--r);border:1px solid var(--b)}
+
+/* ─── NOTICE ─── */
+.notice{background:var(--info2);border:1px solid rgba(77,142,245,.2);border-radius:var(--r);padding:9px 12px;font-size:12px;color:var(--info);margin-bottom:13px;line-height:1.5}
+.notice-warn{background:var(--warn2);border-color:rgba(240,192,64,.25);color:var(--warn)}
+.notice-ok{background:var(--ok2);border-color:rgba(30,200,138,.25);color:var(--ok)}
+.notice-purple{background:var(--purple2);border-color:rgba(167,138,245,.25);color:var(--purple)}
+
+/* ─── UTILS ─── */
+.divider{height:1px;background:var(--b);margin:13px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.sh{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.sh h3{font-family:var(--head);font-size:17px;font-weight:600}
+.mt{margin-top:13px}.mt8{margin-top:8px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}.gold{color:var(--gold)}.dim{color:var(--t3)}.mono{font-family:var(--mono)}
+@media(max-width:700px){
+  .two,.three{grid-template-columns:1fr}
+  .kgrid{grid-template-columns:repeat(2,1fr)}
+  .pgrid{grid-template-columns:1fr}
+  .mbody,.ai-fields-grid{grid-template-columns:1fr}
+  .sr{grid-template-columns:130px 1fr 50px}
+  .offer-variants{grid-template-columns:1fr}
+  .pipeline-bar{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">Deal<span>Vault</span></div>
+  <div class="nav-sep"></div>
+  <button class="nb active" id="nb-portfolio" onclick="nav('portfolio')">⊞ Active <span class="nc" id="pc">0</span></button>
+  <button class="nb" id="nb-opportunity" onclick="nav('opportunity')">◈ Opportunities <span class="nc pulse" id="oc">0</span></button>
+  <button class="nb" id="nb-compare" onclick="nav('compare')">⧖ Compare</button>
+  <button class="nb" id="nb-tools" onclick="nav('tools')">⚙ Tools</button>
+  <button class="nb" id="nb-offers" onclick="nav('offers')">✉ Offer Lab</button>
+  <div class="nav-r">
+    <button class="btn btn-ghost btn-sm" id="clrbtn" onclick="cmpIds.clear();render()" style="display:none">Clear Compare</button>
+    <button class="btn btn-purple btn-sm" onclick="openAIImport()">⚡ AI Import</button>
+    <button class="btn btn-gold" onclick="openAdd()">+ Add Deal</button>
+  </div>
+</nav>
+
+<div class="main"><div class="page" id="app"><div class="loading"><div class="spin"></div>Loading DealVault…</div></div></div>
+<div class="mover" id="mover" onclick="if(event.target===this)closeMod()"><div class="mbox" id="mbox"></div></div>
+
+<script>
+'use strict';
+/* ─── STATE ─── */
+let props=[], view='portfolio', activeId=null, dtab='overview', editP=null, cmpIds=new Set();
+let fStat='all', fStrat='all', q='', sortBy='score';
+let ddState={}, stressD={rd:0,vi:8,ri:0,ei:0,cx:0};
+let toolD={tp:200000,tr:2000,td:25,ti:7,ttx:2400,ti2:1200,tm:10,tcx:150};
+let rehab={foundation:0,roof:0,hvac:5000,plumbing:2000,electric:3000,kitchen:8000,baths:3000,flooring:4000,paint:2000,windows:0,landscape:500,demo:1000,other:0};
+let activeLetter='direct';
+let aiImportResult=null;
+
+/* ─── PIPELINE STAGES ─── */
+const STAGES=[
+  {id:'uploaded',label:'Uploaded',color:'var(--purple)',view:'opportunity'},
+  {id:'prospect',label:'Prospect',color:'#c4aff8',view:'opportunity'},
+  {id:'analyzing',label:'Analyzing',color:'var(--warn)',view:'opportunity'},
+  {id:'offer-out',label:'Offer Out',color:'var(--gold)',view:'portfolio'},
+  {id:'under-contract',label:'Contract',color:'var(--info)',view:'portfolio'},
+  {id:'deal',label:'Active Deal',color:'var(--ok)',view:'portfolio'},
+  {id:'monitoring',label:'Monitoring',color:'var(--ok)',view:'portfolio'},
+  {id:'archived',label:'Archived',color:'var(--t3)',view:'portfolio'}
+];
+
+/* ─── STORAGE (window.storage + localStorage fallback) ─── */
+const HAS_WS=typeof window!=='undefined'&&window.storage&&typeof window.storage.get==='function';
+async function sGet(k){
+  if(HAS_WS){try{const r=await window.storage.get(k);return r?JSON.parse(r.value):null}catch{return null}}
+  try{const v=localStorage.getItem('dv_'+k);return v?JSON.parse(v):null}catch{return null}
+}
+async function sSet(k,v){
+  if(HAS_WS){try{await window.storage.set(k,JSON.stringify(v))}catch(e){console.warn(e)}}
+  else{try{localStorage.setItem('dv_'+k,JSON.stringify(v))}catch(e){console.warn(e)}}
+}
+async function sDel(k){
+  if(HAS_WS){try{await window.storage.delete(k)}catch{}}
+  else{try{localStorage.removeItem('dv_'+k)}catch{}}
+}
+async function sList(pfx){
+  if(HAS_WS){try{const r=await window.storage.list(pfx);return r?.keys||[]}catch{return[]}}
+  const keys=[];
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('dv_'+pfx))keys.push(k.slice(3));}}catch{}
+  return keys;
+}
+async function loadAll(){const ks=await sList('p:');const a=[];for(const k of ks){const p=await sGet(k);if(p)a.push(p);}return a.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));}
+async function saveP(p){await sSet('p:'+p.id,p);}
+async function delP(id){await sDel('p:'+id);}
+async function loadDD(id){return await sGet('dd:'+id)||{};}
+async function saveDD(id,d){await sSet('dd:'+id,d);}
+
+/* ─── PROP FACTORY ─── */
+function mkProp(o={}){
+  return{id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+  createdAt:new Date().toISOString(),address:'',city:'',state:'',zip:'',
+  type:'SFR',units:1,beds:3,baths:2,sqft:1200,yearBuilt:2000,listingUrl:'',
+  strategy:'buy-hold',status:'analyzing',source:'MLS',
+  listPrice:200000,offerPrice:0,purchasePrice:200000,closingPct:3,
+  rent:2000,otherIncome:0,vacRate:8,mgmtPct:10,
+  taxes:2400,ins:1200,hoa:0,maint:120,capex:150,utils:0,
+  downPct:25,rate:7.0,term:30,
+  arv:0,rehab:0,hmRate:12,hmPts:2,holdMo:6,
+  appRate:3.5,rentGr:2.5,fmr:0,motivScore:0,
+  aiGenerated:false,listingImages:[],agentName:'',agentPhone:'',agentEmail:'',sellerName:'',
+  notes:'',motivNotes:'',offerNotes:'',...o};
+}
+
+/* ─── CALCULATIONS ─── */
+function calc(p){
+  const price=Math.max(1,+p.purchasePrice||+p.listPrice||1);
+  const units=Math.max(1,+p.units||1);
+  const grossRent=(+p.rent*units + +p.otherIncome)*12;
+  const vacLoss=grossRent*((+p.vacRate)/100);
+  const egi=grossRent-vacLoss;
+  const mgmt=egi*((+p.mgmtPct)/100);
+  const opex=+p.taxes + +p.ins + +p.hoa*12 + +p.maint*12 + +p.capex*12 + +p.utils*12 + mgmt;
+  const noi=egi-opex;
+  const oer=egi>0?opex/egi*100:0;
+  const downAmt=price*((+p.downPct)/100);
+  const closing=price*((+p.closingPct)/100);
+  const loan=price-downAmt;
+  const r=(+p.rate)/100/12;
+  const n=(+p.term)*12;
+  const mort=r>0?loan*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1):loan/(n||360);
+  const annDebt=mort*12;
+  const annCF=noi-annDebt;
+  const moCF=annCF/12;
+  const cashIn=downAmt+closing+(p.strategy==='BRRRR'?+p.rehab:0);
+  const capRate=noi/price*100;
+  const coc=cashIn>0?annCF/cashIn*100:0;
+  const grm=grossRent>0?price/grossRent:0;
+  const dscr=annDebt>0?noi/annDebt:0;
+  const pct1=price>0?+p.rent/price*100:0;
+  const arv=+p.arv||0;
+  const rehabC=+p.rehab||0;
+  const mao70=arv>0?arv*0.70-rehabC:0;
+  const totalProj=price+rehabC;
+  const refi75=arv*0.75;
+  const cashRecov=refi75-totalProj;
+  const hmCost=price*0.9*((+p.hmRate)/100)*((+p.holdMo)/12)+price*0.9*((+p.hmPts)/100);
+  const depBase=price*0.80;
+  const annDep=depBase/27.5;
+  let sc=0;
+  if(coc>=12)sc+=20;else if(coc>=8)sc+=14;else if(coc>=5)sc+=7;else if(coc>=0)sc+=2;
+  if(capRate>=8)sc+=15;else if(capRate>=6)sc+=10;else if(capRate>=4)sc+=5;
+  if(moCF>=400)sc+=15;else if(moCF>=200)sc+=10;else if(moCF>=0)sc+=5;
+  if(dscr>=1.5)sc+=15;else if(dscr>=1.25)sc+=10;else if(dscr>=1.0)sc+=5;
+  if(pct1>=1.5)sc+=10;else if(pct1>=1.0)sc+=6;else if(pct1>=0.7)sc+=3;
+  if(+p.motivScore>=60)sc+=15;else if(+p.motivScore>=30)sc+=8;else if(+p.motivScore>=10)sc+=3;
+  if(units>=4)sc+=10;else if(units>=2)sc+=5;
+  sc=Math.min(100,Math.max(0,Math.round(sc)));
+  return{price,grossRent,vacLoss,egi,mgmt,opex,noi,oer,downAmt,closing,loan,mort,annDebt,annCF,moCF,cashIn,capRate,coc,grm,dscr,pct1,mao70,totalProj,refi75,cashRecov,hmCost,depBase,annDep,arv,rehabC,sc};
+}
+function scColor(s){return s>=80?'var(--ok)':s>=65?'#6dd98c':s>=50?'var(--warn)':'var(--bad)';}
+function scVerdict(s){return s>=80?'Elite Deal':s>=65?'Strong Deal':s>=50?'Marginal':'Pass';}
+function kcol(v,t){
+  if(t==='coc')return v>=8?'ok':v>=5?'warn':'bad';
+  if(t==='cap')return v>=6?'ok':v>=4?'warn':'bad';
+  if(t==='cf')return v>=200?'ok':v>=0?'warn':'bad';
+  if(t==='dscr')return v>=1.25?'ok':v>=1.0?'warn':'bad';
+  if(t==='p1')return v>=1.0?'ok':v>=0.7?'warn':'bad';
+  if(t==='grm')return v<=8?'ok':v<=12?'warn':'bad';
+  return 'n';
+}
+function kcolHex(v,t){const c=kcol(v,t);return c==='ok'?'var(--ok)':c==='warn'?'var(--warn)':'var(--bad)';}
+function f$(n){if(n===undefined||n===null||isNaN(n))return'—';const a=Math.abs(n),s=n<0?'−':'';if(a>=1e6)return s+'$'+(a/1e6).toFixed(1)+'M';return s+'$'+Math.round(a).toLocaleString();}
+function fp$(n,d=1){return isNaN(n)?'0':n.toFixed(d);}
+function fx(n,d=2){return isNaN(n)?'—':n.toFixed(d)+'x';}
+function pbar(pct,color){return '<div class="kcard-bar"><div class="kcard-bar-fill" style="width:'+Math.min(100,Math.max(0,pct))+'%;background:'+color+'"></div></div>';}
+
+/* ─── HOLDING ─── */
+function holdRows(p,c){
+  const rows=[];
+  const r=(+p.rate)/100/12,n=(+p.term)*12;
+  for(const yr of[1,3,5,7,10,15,20]){
+    let bal=c.loan;
+    for(let m=0;m<yr*12;m++){const i=bal*r,pr=c.mort-i;bal=Math.max(0,bal-pr);}
+    const val=c.price*Math.pow(1+(+p.appRate)/100,yr);
+    const eq=val-bal;
+    const cf=c.annCF*yr*(1+(+p.rentGr)/100*yr/2);
+    rows.push({yr,val,bal,eq,pp:c.loan-bal,appG:val-c.price,cf,tw:eq-c.downAmt-c.closing+cf});
+  }
+  return rows;
+}
+
+/* ─── NAVIGATE ─── */
+function nav(v,id=null,tab='overview'){
+  view=v;if(id)activeId=id;if(tab)dtab=tab;
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('nb-'+v);if(el)el.classList.add('active');
+  render();window.scrollTo(0,0);
+}
+
+/* ─── RENDER ─── */
+function render(){
+  const app=document.getElementById('app');
+  try{
+    if(view==='portfolio')app.innerHTML=renderPortfolio();
+    else if(view==='opportunity')app.innerHTML=renderOpportunity();
+    else if(view==='detail')app.innerHTML=renderDetail();
+    else if(view==='compare')app.innerHTML=renderCompare();
+    else if(view==='tools')app.innerHTML=renderTools();
+    else if(view==='offers')app.innerHTML=renderOffers();
+  }catch(e){console.error(e);app.innerHTML='<div class="empty"><h3>Render error</h3><p>'+e.message+'</p></div>';}
+  document.getElementById('pc').textContent=props.filter(p=>['offer-out','under-contract','deal','monitoring'].includes(p.status)).length;
+  document.getElementById('oc').textContent=props.filter(p=>['uploaded','prospect','analyzing'].includes(p.status)).length;
+  document.getElementById('clrbtn').style.display=cmpIds.size>0?'flex':'none';
+  const si=document.getElementById('srch');if(si)si.addEventListener('input',e=>{q=e.target.value;render();});
+}
+
+/* ─── OPPORTUNITY VIEW ─── */
+function renderOpportunity(){
+  const oppStages=['uploaded','prospect','analyzing'];
+  const opp=props.filter(p=>oppStages.includes(p.status));
+  const allC=opp.map(p=>calc(p));
+  const byStage={uploaded:[],prospect:[],analyzing:[]};
+  opp.forEach(p=>byStage[p.status]&&byStage[p.status].push(p));
+  const stageMeta={
+    uploaded:{label:'Uploaded',color:'var(--purple)',desc:'AI profiled, pending review'},
+    prospect:{label:'Prospect',color:'#c4aff8',desc:'Screened, potential target'},
+    analyzing:{label:'Analyzing',color:'var(--warn)',desc:'Deep analysis underway'}
+  };
+  const stats=[
+    {l:'Opportunities',v:opp.length.toString(),c:'var(--purple)'},
+    {l:'Avg Deal Score',v:fp$(allC.length?allC.reduce((s,c)=>s+c.sc,0)/allC.length:0)+'/100',c:'var(--gold)'},
+    {l:'Best Score',v:allC.length?Math.max(...allC.map(c=>c.sc))+'/100':'—',c:'var(--ok)'},
+    {l:'Total Value',v:f$(opp.reduce((s,p)=>s+(+p.listPrice||0),0)),c:'var(--t1)'},
+  ];
+  return `
+  <div class="ph"><h1>Deal <span class="purple">Opportunities</span></h1></div>
+  <div class="notice notice-purple">⚡ This is your deal funnel. Properties move: <b>Upload → Prospect → Analyzing → Offer Out</b>. Use AI Import to add any Zillow/Redfin listing instantly.</div>
+  <div class="stats-bar">${stats.map(s=>'<div class="sc"><div class="sc-l">'+s.l+'</div><div class="sc-v" style="color:'+s.c+'">'+s.v+'</div></div>').join('')}</div>
+
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+    <button class="btn btn-purple" onclick="openAIImport()">⚡ AI Import from URL</button>
+    <button class="btn btn-ghost" onclick="openAdd()">+ Manual Add</button>
+    <div style="flex:1"></div>
+    <div class="sw"><span class="sw-icon">⌕</span><input id="srch" class="fi" placeholder="Search…" value="${q.replace(/"/g,'&quot;')}" style="padding-left:27px"></div>
+  </div>
+
+  <div class="pipeline-wrap">
+    ${oppStages.map(stageId=>{
+      const m=stageMeta[stageId];
+      const items=byStage[stageId]||[];
+      const filtered=q?items.filter(p=>(p.address+' '+p.city).toLowerCase().includes(q.toLowerCase())):items;
+      return '<div class="pipe-col">'+
+        '<div class="pipe-col-hdr" style="border-left:3px solid '+m.color+'">'+
+        '<div class="pipe-col-title" style="color:'+m.color+'">'+m.label+'</div>'+
+        '<span class="pipe-col-count">'+filtered.length+'</span>'+
+        '<span style="font-size:11px;color:var(--t3);margin-left:4px">'+m.desc+'</span>'+
+        '</div>'+
+        (filtered.length===0?'<div style="padding:20px;text-align:center;color:var(--t3);font-size:12px">No properties</div>':
+        filtered.map(p=>{
+          const c=calc(p);const sc=c.sc;const sC=scColor(sc);
+          return '<div class="pipe-card" onclick="nav(\'detail\',\''+p.id+'\')">'+
+            (p.aiGenerated?'<div style="font-size:10px;color:var(--purple);font-family:var(--head);font-weight:700;margin-bottom:3px">⚡ AI PROFILED</div>':'')+
+            '<div class="pipe-card-addr">'+(p.address||'Untitled Property')+'</div>'+
+            '<div class="pipe-card-meta">'+(p.city?p.city+', ':'')+p.state+' · '+p.type+' · '+p.beds+'bd/'+p.baths+'ba</div>'+
+            '<div class="pipe-card-price">'+f$(+p.listPrice||+p.purchasePrice)+'<span style="font-size:11px;color:var(--t3)"> · '+f$(+p.rent)+'/mo</span></div>'+
+            '<div class="pipe-card-score"><span style="font-size:10px;color:var(--t3)">Score</span><div class="pipe-score-bar"><div class="pipe-score-fill" style="width:'+sc+'%;background:'+sC+'"></div></div><span style="font-family:var(--mono);font-size:11px;color:'+sC+'">'+sc+'</span></div>'+
+            '<div style="display:flex;gap:5px;margin-top:7px">'+
+            '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();promoteStage(\''+p.id+'\')">Promote →</button>'+
+            '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();nav(\'detail\',\''+p.id+'\')">Analyze</button>'+
+            '</div>'+
+            '</div>';
+        }).join(''))+
+        '</div>';
+    }).join('')}
+  </div>`;
+}
+
+/* ─── PORTFOLIO VIEW ─── */
+function renderPortfolio(){
+  const activeStages=['offer-out','under-contract','deal','monitoring','archived'];
+  let fp=props.filter(p=>activeStages.includes(p.status));
+  if(fStat!=='all')fp=fp.filter(p=>p.status===fStat);
+  if(fStrat!=='all')fp=fp.filter(p=>p.strategy===fStrat);
+  if(q)fp=fp.filter(p=>(p.address+' '+p.city+' '+p.state).toLowerCase().includes(q.toLowerCase()));
+  if(sortBy==='score')fp.sort((a,b)=>calc(b).sc-calc(a).sc);
+  else if(sortBy==='cf')fp.sort((a,b)=>calc(b).moCF-calc(a).moCF);
+  else if(sortBy==='cap')fp.sort((a,b)=>calc(b).capRate-calc(a).capRate);
+  else if(sortBy==='price')fp.sort((a,b)=>b.purchasePrice-a.purchasePrice);
+  else fp.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const allC=fp.map(p=>calc(p));
+  const totVal=fp.reduce((s,p)=>s+(+p.purchasePrice||0),0);
+  const totCF=allC.reduce((s,c)=>s+c.moCF,0);
+  const avgCoc=allC.length?allC.reduce((s,c)=>s+c.coc,0)/allC.length:0;
+  const avgCap=allC.length?allC.reduce((s,c)=>s+c.capRate,0)/allC.length:0;
+  const stats=[
+    {l:'Active Deals',v:fp.length.toString(),c:'var(--t1)'},
+    {l:'Portfolio Value',v:f$(totVal),c:'var(--t1)'},
+    {l:'Total CF / mo',v:f$(totCF)+'/mo',c:totCF>=0?'var(--ok)':'var(--bad)'},
+    {l:'Avg Cap Rate',v:fp$(avgCap)+'%',c:avgCap>=6?'var(--ok)':avgCap>=4?'var(--warn)':'var(--bad)'},
+    {l:'Avg CoC',v:fp$(avgCoc)+'%',c:avgCoc>=8?'var(--ok)':avgCoc>=5?'var(--warn)':'var(--bad)'},
+    {l:'In Pipeline',v:props.filter(p=>['uploaded','prospect','analyzing'].includes(p.status)).length.toString(),c:'var(--purple)'},
+  ];
+  const statuses=[['offer-out','Offer Out'],['under-contract','Contract'],['deal','Active Deal'],['monitoring','Monitoring'],['archived','Archived']];
+  const strats=[['buy-hold','Buy & Hold'],['BRRRR','BRRRR'],['section8','Sec. 8'],['flip','Flip'],['STR','STR'],['house-hack','House Hack']];
+  return `
+  <div class="ph"><h1>Active <span>Portfolio</span></h1><div style="flex:1"></div></div>
+  ${fp.length>0?'<div class="stats-bar">'+stats.map(s=>'<div class="sc"><div class="sc-l">'+s.l+'</div><div class="sc-v" style="color:'+s.c+'">'+s.v+'</div></div>').join('')+'</div>':''}
+  <div class="filter-row">
+    <span class="fl">Status</span>
+    <button class="fb ${fStat==='all'?'on':''}" onclick="fStat='all';render()">All</button>
+    ${statuses.map(([v,l])=>'<button class="fb '+(fStat===v?'on':'')+'" onclick="fStat=\''+v+'\';render()">'+l+'</button>').join('')}
+    <div style="flex:1"></div>
+    <div class="sw"><span class="sw-icon">⌕</span><input id="srch" class="fi" placeholder="Search…" value="${q.replace(/"/g,'&quot;')}" style="padding-left:27px"></div>
+    <select class="sort-sel" onchange="sortBy=this.value;render()">
+      <option value="score" ${sortBy==='score'?'selected':''}>Score</option>
+      <option value="cf" ${sortBy==='cf'?'selected':''}>Cash Flow</option>
+      <option value="cap" ${sortBy==='cap'?'selected':''}>Cap Rate</option>
+      <option value="price" ${sortBy==='price'?'selected':''}>Price</option>
+      <option value="date" ${sortBy==='date'?'selected':''}>Newest</option>
+    </select>
+  </div>
+  <div class="filter-row" style="margin-top:-6px">
+    <span class="fl">Strategy</span>
+    <button class="fb ${fStrat==='all'?'on':''}" onclick="fStrat='all';render()">All</button>
+    ${strats.map(([v,l])=>'<button class="fb '+(fStrat===v?'on':'')+'" onclick="fStrat=\''+v+'\';render()">'+l+'</button>').join('')}
+  </div>
+  ${cmpIds.size>0?'<div class="notice" style="margin-bottom:10px">⧖ '+cmpIds.size+' selected — <button onclick="nav(\'compare\')" style="background:none;border:none;color:var(--info);cursor:pointer;font-size:12px;font-family:var(--body)">View Comparison →</button></div>':''}
+  ${fp.length===0?renderEmpty():'<div class="pgrid">'+fp.map(p=>renderCard(p)).join('')+'</div>'}`;
+}
+
+function renderEmpty(){
+  return '<div class="empty"><div class="ei">🏘</div><h3>No active deals</h3><p>Import a Zillow or Redfin URL with AI, or add a deal manually. New deals start as Opportunities.</p><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="btn btn-purple" onclick="openAIImport()">⚡ AI Import</button><button class="btn btn-ghost" onclick="openAdd()">Manual Add</button></div></div>';
+}
+
+function renderCard(p){
+  const c=calc(p);const sc=c.sc;const scC=scColor(sc);
+  const ua=p.units>1?(p.units+' units · '):'';
+  return '<div class="pcard '+(cmpIds.has(p.id)?'cmp':'')+'" onclick="nav(\'detail\',\''+p.id+'\')">'
+    +(p.aiGenerated?'<div class="ai-badge">⚡ AI</div>':'')
+    +'<button class="ctog '+(cmpIds.has(p.id)?'on':'')+'" onclick="event.stopPropagation();toggleCmp(\''+p.id+'\')">'+(cmpIds.has(p.id)?'✓':'+')+'</button>'
+    +'<div class="ctop">'
+    +'<div class="cbadges"><span class="bg bg-strat">'+stratL(p.strategy)+'</span><span class="bg '+bgCls(p.status)+'">'+statL(p.status)+'</span><span class="bg bg-src">'+(p.source||'MLS')+'</span></div>'
+    +'<div class="cadr">'+(p.address||'Untitled Property')+'</div>'
+    +'<div class="cmeta">'+[p.city,p.state].filter(Boolean).join(', ')+' · '+p.type+' · '+ua+p.beds+'bd/'+p.baths+'ba · '+(+p.sqft||0).toLocaleString()+' sf</div>'
+    +'<div class="cprice">'+f$(+p.purchasePrice||+p.listPrice)+' <span>· '+f$(+p.rent)+'/mo rent</span></div>'
+    +'</div>'
+    +'<div class="ckpis">'
+    +'<div class="kc"><div class="klbl">CoC Return</div><div class="kval '+kcol(c.coc,'coc')+'">'+fp$(c.coc)+'%</div></div>'
+    +'<div class="kc"><div class="klbl">Cap Rate</div><div class="kval '+kcol(c.capRate,'cap')+'">'+fp$(c.capRate)+'%</div></div>'
+    +'<div class="kc"><div class="klbl">Cash Flow</div><div class="kval '+kcol(c.moCF,'cf')+'">'+(c.moCF>=0?'+':'')+f$(c.moCF)+'/mo</div></div>'
+    +'<div class="kc"><div class="klbl">DSCR</div><div class="kval '+kcol(c.dscr,'dscr')+'">'+fx(c.dscr)+'</div></div>'
+    +'<div class="kc"><div class="klbl">1% Rule</div><div class="kval '+kcol(c.pct1,'p1')+'">'+fp$(c.pct1)+'%</div></div>'
+    +'<div class="kc"><div class="klbl">GRM</div><div class="kval '+kcol(c.grm,'grm')+'">'+fx(c.grm,1)+'</div></div>'
+    +'</div>'
+    +'<div class="cscore"><span style="font-size:10px;color:var(--t3);min-width:62px">Deal Score</span><div class="cstk"><div class="csfill" style="width:'+sc+'%;background:'+scC+'"></div></div><span class="csnum" style="color:'+scC+'">'+sc+'</span><span class="csverd" style="color:'+scC+'">'+scVerdict(sc)+'</span></div>'
+    +'<div class="cacts" onclick="event.stopPropagation()">'
+    +'<button class="btn btn-ghost btn-sm" onclick="nav(\'detail\',\''+p.id+'\')">Analyze →</button>'
+    +'<button class="btn btn-ghost btn-sm" onclick="openEdit(\''+p.id+'\')">Edit</button>'
+    +'<button class="btn btn-danger btn-sm" onclick="doDelete(\''+p.id+'\')">Del</button>'
+    +'</div>'
+    +'</div>';
+}
+
+/* ─── DETAIL ─── */
+function renderDetail(){
+  const p=props.find(x=>x.id===activeId);
+  if(!p)return '<div class="empty"><h3>Not found</h3><button class="btn btn-ghost" onclick="nav(\'portfolio\')">← Back</button></div>';
+  const c=calc(p);
+  const isOpp=['uploaded','prospect','analyzing'].includes(p.status);
+  const tabs=[['overview','Overview'],['cashflow','Cash Flow'],['brrrr','BRRRR/Rehab'],['tax','Tax & Depreciation'],['stress','Stress Test'],['holding','Hold Period'],['dd','Due Diligence'],['exit','Exit Strategies']];
+  const ua=p.units>1?(p.units+' units · '):'';
+  return '<button class="back-btn" onclick="nav(\''+(isOpp?'opportunity':'portfolio')+'\')">← Back</button>'
+    +'<div class="dtitle">'+(p.address||'Untitled Property')+(p.aiGenerated?' <span class="bg bg-uploaded" style="vertical-align:middle;margin-left:8px">⚡ AI PROFILED</span>':'')+'</div>'
+    +'<div class="dmeta"><div class="cbadges" style="display:flex;gap:5px;flex-wrap:wrap"><span class="bg bg-strat">'+stratL(p.strategy)+'</span><span class="bg '+bgCls(p.status)+'">'+statL(p.status)+'</span><span class="bg bg-src">'+(p.source||'MLS')+'</span></div>'
+    +'<span style="color:var(--t3)">·</span><span>'+[p.city,p.state].filter(Boolean).join(', ')+'</span>'
+    +'<span style="color:var(--t3)">·</span><span>'+p.type+' · '+ua+p.beds+'bd/'+p.baths+'ba · '+(+p.sqft||0).toLocaleString()+' sf · Built '+p.yearBuilt+'</span>'
+    +(p.listingUrl?'<a href="'+p.listingUrl+'" target="_blank" style="color:var(--info);font-size:12px">View Listing ↗</a>':'')
+    +'</div>'
+    +'<div class="dacts">'
+    +(isOpp?'<button class="btn btn-gold btn-sm" onclick="promoteStage(\''+p.id+'\')">Promote to Offer Out →</button>':'')
+    +'<button class="btn btn-ghost btn-sm" onclick="toggleCmp(\''+p.id+'\')">'+(cmpIds.has(p.id)?'✓ In Compare':'+ Compare')+'</button>'
+    +'<button class="btn btn-ghost btn-sm" onclick="openEdit(\''+p.id+'\')">✎ Edit</button>'
+    +'<button class="btn btn-ghost btn-sm" onclick="nav(\'offers\')">✉ Generate Offer</button>'
+    +'<button class="btn btn-danger btn-sm" onclick="doDelete(\''+p.id+'\')">Delete</button>'
+    +'</div>'
+    +'<div class="divider"></div>'
+    +'<div class="tabs">'+tabs.map(([id,l])=>'<button class="tab '+(dtab===id?'on':'')+'" onclick="dtab=\''+id+'\';render()">'+l+'</button>').join('')+'</div>'
+    +(dtab==='overview'?tabOverview(p,c):dtab==='cashflow'?tabCashflow(p,c):dtab==='brrrr'?tabBRRRR(p,c):dtab==='tax'?tabTax(p,c):dtab==='stress'?tabStress(p,c):dtab==='holding'?tabHolding(p,c):dtab==='dd'?tabDD(p,c):tabExit(p,c));
+}
+
+/* ─── TAB: OVERVIEW ─── */
+function tabOverview(p,c){
+  const sc=c.sc;const sC=scColor(sc);
+  const srows=[
+    {l:'Cash-on-Cash Return',max:20,got:c.coc>=12?20:c.coc>=8?14:c.coc>=5?7:c.coc>=0?2:0,u:fp$(c.coc)+'%'},
+    {l:'Cap Rate',max:15,got:c.capRate>=8?15:c.capRate>=6?10:c.capRate>=4?5:0,u:fp$(c.capRate)+'%'},
+    {l:'Monthly Cash Flow',max:15,got:c.moCF>=400?15:c.moCF>=200?10:c.moCF>=0?5:0,u:f$(c.moCF)+'/mo'},
+    {l:'DSCR Coverage',max:15,got:c.dscr>=1.5?15:c.dscr>=1.25?10:c.dscr>=1.0?5:0,u:fx(c.dscr)},
+    {l:'1% Rule Check',max:10,got:c.pct1>=1.5?10:c.pct1>=1.0?6:c.pct1>=0.7?3:0,u:fp$(c.pct1)+'%'},
+    {l:'Seller Motivation',max:15,got:+p.motivScore>=60?15:+p.motivScore>=30?8:+p.motivScore>=10?3:0,u:(+p.motivScore)+'/100'},
+    {l:'Multi-Unit Bonus',max:10,got:Math.min(10,Math.max(0,(+p.units-1)*3)),u:p.units+' units'},
+  ];
+  const kds=[
+    {l:'Purchase Price',v:f$(c.price),s:'',pct:100,c:'var(--t1)'},
+    {l:'Annual NOI',v:f$(c.noi),s:'Net Operating Income',pct:c.noi>=0?80:10,c:c.noi>=0?'var(--ok)':'var(--bad)'},
+    {l:'Cash-on-Cash',v:fp$(c.coc)+'%',s:'Annual levered yield',pct:Math.min(100,c.coc/12*100),c:kcolHex(c.coc,'coc')},
+    {l:'Cap Rate',v:fp$(c.capRate)+'%',s:'Unleveraged yield',pct:Math.min(100,c.capRate/10*100),c:kcolHex(c.capRate,'cap')},
+    {l:'Cash Flow',v:f$(c.moCF)+'/mo',s:f$(c.annCF)+'/yr',pct:Math.min(100,Math.max(0,(c.moCF+200)/600*100)),c:kcolHex(c.moCF,'cf')},
+    {l:'DSCR',v:fx(c.dscr),s:'Debt Service Coverage',pct:Math.min(100,c.dscr/1.5*100),c:kcolHex(c.dscr,'dscr')},
+    {l:'1% Rule',v:fp$(c.pct1)+'%',s:'Rent / Price',pct:Math.min(100,c.pct1/1.5*100),c:kcolHex(c.pct1,'p1')},
+    {l:'GRM',v:fx(c.grm,1),s:'Gross Rent Multiplier',pct:Math.min(100,Math.max(0,(16-c.grm)/16*100)),c:kcolHex(c.grm,'grm')},
+    {l:'Down Payment',v:f$(c.downAmt),s:fp$(+p.downPct)+'% of price',pct:100,c:'var(--t2)'},
+    {l:'Total Cash In',v:f$(c.cashIn),s:'Down + Closing',pct:100,c:'var(--t2)'},
+    {l:'Monthly Mortgage',v:f$(c.mort)+'/mo',s:'P&I only',pct:100,c:'var(--t2)'},
+    {l:'Annual Depreciation',v:f$(c.annDep),s:'Tax shield estimate',pct:100,c:'var(--gold)'},
+  ];
+  return '<div class="scard">'
+    +'<div class="sbig"><div class="sbig-num" style="color:'+sC+'">'+sc+'</div><div class="sbig-lbl">Deal Score / 100</div><div class="sbig-verd" style="color:'+sC+'">'+scVerdict(sc)+'</div></div>'
+    +'<div class="sbdown"><div class="sbdown-title">Score Breakdown</div>'
+    +srows.map(r=>{const pct=r.max>0?r.got/r.max*100:0;const col=pct>=75?'var(--ok)':pct>=40?'var(--warn)':'var(--bad)';return '<div class="sbrow"><span class="sbrow-lbl">'+r.l+'</span><div class="sbrow-trk"><div class="sbrow-fill" style="width:'+pct+'%;background:'+col+'"></div></div><span class="sbrow-val" style="color:'+col+'">'+r.u+'</span></div>';}).join('')
+    +'</div>'
+    +'<div style="font-size:12px;color:var(--t3);max-width:170px;line-height:1.6">'+(sc>=80?'🔥 Elite — move fast.':sc>=65?'✓ Strong — proceed.':sc>=50?'⚠ Marginal — negotiate.':'✗ Below threshold — price drop needed.')+'</div>'
+    +'</div>'
+    +'<div class="kgrid">'+kds.map(k=>'<div class="kcard"><div class="kcard-lbl">'+k.l+'</div><div class="kcard-val" style="color:'+k.c+'">'+k.v+'</div>'+(k.s?'<div class="kcard-sub">'+k.s+'</div>':'')+pbar(k.pct,k.c)+'</div>').join('')+'</div>'
+    +(p.agentName||p.agentPhone?'<div class="notice" style="background:var(--bg2);border-color:var(--b2);color:var(--t2)">👤 '+[p.agentName,p.agentPhone,p.agentEmail].filter(Boolean).join(' · ')+'</div>':'')
+    +(p.notes?'<div class="notice" style="background:var(--bg2);border-color:var(--b2);color:var(--t2)">📝 '+p.notes+'</div>':'');
+}
+
+/* ─── TAB: CASHFLOW ─── */
+function tabCashflow(p,c){
+  return '<div class="two">'
+    +'<div><div class="sh"><h3>Income & Expense Waterfall</h3></div><div class="wf">'
+    +wr('Gross Annual Rent',c.grossRent,'n')
+    +wr('+ Other Income',+p.otherIncome*12,'dim',true)
+    +wr('− Vacancy ('+p.vacRate+'%)',-c.vacLoss,'bad',true)
+    +wr('= Effective Gross Income',c.egi,'n',false,true)
+    +wr('− Property Taxes',-p.taxes,'bad',true)
+    +wr('− Insurance',-p.ins,'bad',true)
+    +(+p.hoa>0?wr('− HOA',-(+p.hoa*12),'bad',true):'')
+    +wr('− Mgmt ('+p.mgmtPct+'%)',-c.mgmt,'bad',true)
+    +wr('− Maintenance Reserve',-(+p.maint*12),'bad',true)
+    +wr('− CapEx Reserve',-(+p.capex*12),'bad',true)
+    +(+p.utils>0?wr('− Utilities (LL paid)',-(+p.utils*12),'bad',true):'')
+    +wr('= Net Operating Income',c.noi,c.noi>=0?'ok':'bad',false,true)
+    +wr('− Debt Service (P&I)',-c.annDebt,'bad',true)
+    +wr('= Annual Cash Flow',c.annCF,c.annCF>=0?'ok':'bad',false,true,'tot')
+    +wr('Monthly Cash Flow',c.moCF,c.moCF>=0?'ok':'bad',false,true,'tot')
+    +'</div></div>'
+    +'<div><div class="sh"><h3>Key Ratios</h3></div><div class="wf">'
+    +wr('Operating Expense Ratio',fp$(c.oer)+'%',c.oer<50?'ok':c.oer<60?'warn':'bad')
+    +wr('Net Profit Margin',fp$(c.grossRent>0?c.noi/c.grossRent*100:0)+'%',c.noi>=0?'ok':'bad')
+    +wr('Loan-to-Value',fp$(100-+p.downPct)+'%','n')
+    +wr('DSCR',fx(c.dscr),c.dscr>=1.25?'ok':c.dscr>=1?'warn':'bad')
+    +wr('GRM',fx(c.grm,1),c.grm<=8?'ok':c.grm<=12?'warn':'bad')
+    +wr('Break-even Occupancy',fp$(c.grossRent>0?(c.opex+c.annDebt)/c.grossRent*100:100)+'%','n')
+    +wr('Cash-on-Cash',fp$(c.coc)+'%',c.coc>=8?'ok':c.coc>=5?'warn':'bad')
+    +wr('Cap Rate',fp$(c.capRate)+'%',c.capRate>=6?'ok':c.capRate>=4?'warn':'bad')
+    +'</div>'
+    +'<div class="sh mt"><h3>Screening Rules</h3></div>'
+    +'<div class="rgrid">'
+    +'<div class="ri"><div class="ri-name">1% Rule</div><div class="ri-val" style="color:'+(c.pct1>=1?'var(--ok)':'var(--bad)')+'">'+fp$(c.pct1)+'%</div><div class="ri-sub">Target ≥ 1.0%</div></div>'
+    +'<div class="ri"><div class="ri-name">50% Rule</div><div class="ri-val" style="color:'+(c.oer<=55?'var(--ok)':'var(--bad)')+'">'+fp$(c.oer)+'%</div><div class="ri-sub">OpEx / Gross Rent</div></div>'
+    +'<div class="ri"><div class="ri-name">$200/Door</div><div class="ri-val" style="color:'+(c.moCF/Math.max(1,+p.units)>=200?'var(--ok)':'var(--warn)')+'">'+f$(c.moCF/Math.max(1,+p.units))+'</div><div class="ri-sub">Per unit/mo</div></div>'
+    +'<div class="ri"><div class="ri-name">NOI Margin</div><div class="ri-val">'+fp$(c.grossRent>0?c.noi/c.grossRent*100:0)+'%</div><div class="ri-sub">NOI / Gross Rent</div></div>'
+    +'</div></div></div>';
+}
+function wr(label,val,cls,indent,sub,extra){
+  const v=typeof val==='number'?f$(val):val;
+  const ec=extra||'';
+  return '<div class="wfr '+ec+'">'+'<div class="wfl '+(indent?'ind ':'')+(sub?'str':'')+'">'+label+'</div><div class="wfv '+cls+'">'+v+'</div></div>';
+}
+
+/* ─── TAB: BRRRR ─── */
+function tabBRRRR(p,c){
+  const ok=c.arv>0&&c.totalProj<=c.refi75;
+  const eq=c.cashRecov;
+  return '<div class="notice">BRRRR = Buy · Rehab · Rent · Refinance · Repeat. Enter ARV and Rehab Cost to analyze.</div>'
+    +'<div class="bgrid">'
+    +bc('Purchase Price',f$(c.price),'')
+    +bc('Rehab Cost',f$(c.rehabC),c.rehabC>0?'Estimated renovation':'Enter in Edit')
+    +bc('Total Project Cost',f$(c.totalProj),'Purchase + Rehab')
+    +bc('After Repair Value (ARV)',c.arv>0?f$(c.arv):'Not entered','Edit → BRRRR section')
+    +bc('75% ARV (refi max)',c.arv>0?f$(c.refi75):'—','Standard DSCR LTV')
+    +bc('Max Allowable Offer',c.arv>0?f$(c.mao70):'—','ARV × 70% − Rehab')
+    +bc('Cash Recovered at Refi',c.arv>0?f$(eq):'—',eq>=0?'Capital returned':'Cash left in deal')
+    +bc('Hard Money Cost Est.',f$(c.hmCost),p.holdMo+'mo @ '+p.hmRate+'%')
+    +'</div>'
+    +(c.arv>0?
+      '<div class="bres '+(ok?'ok':eq>-10000?'warn':'bad')+'"><span style="font-size:19px">'+(ok?'✓':'✗')+'</span><div><div style="font-weight:600">'+(ok?'BRRRR works — capital recycled at refinance':'BRRRR fails — project cost exceeds 75% ARV')+'</div><div style="font-size:12px;opacity:.8;margin-top:2px">Total cost '+f$(c.totalProj)+' '+(ok?'is within':'exceeds')+' 75% ARV ('+f$(c.refi75)+'). '+(eq>=0?'~'+f$(eq)+' equity recovered.':'Need '+f$(-eq)+' more.')+'</div></div></div>'
+      +'<div class="wf" style="margin-bottom:13px">'
+      +wr('Purchase Price',-c.price,'bad')
+      +wr('Rehab Cost',-c.rehabC,'bad')
+      +wr('Hard Money Cost',-c.hmCost,'bad',true)
+      +wr('= Total Cash Out',-(c.totalProj+c.hmCost),'bad',false,true,'tot')
+      +wr('Cash-Out Refi (75% ARV)',c.refi75,'ok')
+      +wr('= Net Capital Recovered',c.refi75-(c.totalProj+c.hmCost),(c.refi75-(c.totalProj+c.hmCost))>=0?'ok':'bad',false,true,'tot')
+      +'</div>'
+    :'<div class="notice notice-warn">Enter ARV in Edit to complete BRRRR analysis.</div>')
+    +'<div class="sh"><h3>BRRRR Benchmarks</h3></div>'
+    +'<div class="rgrid">'
+    +'<div class="ri"><div class="ri-name">70% Rule</div><div class="ri-val">MAO</div><div class="ri-sub">ARV×70% − Rehab</div></div>'
+    +'<div class="ri"><div class="ri-name">Refi LTV Max</div><div class="ri-val">75%</div><div class="ri-sub">Most DSCR lenders</div></div>'
+    +'<div class="ri"><div class="ri-name">Seasoning</div><div class="ri-val">6 mo</div><div class="ri-sub">Before refi</div></div>'
+    +'<div class="ri"><div class="ri-name">Rehab Budget</div><div class="ri-val">&lt;30%</div><div class="ri-sub">Of ARV</div></div>'
+    +'<div class="ri"><div class="ri-name">Contingency</div><div class="ri-val">+20%</div><div class="ri-sub">On all rehab budgets</div></div>'
+    +'<div class="ri"><div class="ri-name">Infinite Return</div><div class="ri-val">&lt;70%</div><div class="ri-sub">Total cost / ARV</div></div>'
+    +'</div>';
+}
+function bc(label,val,sub){return '<div class="bcard"><h4>'+label+'</h4><div class="bv">'+val+'</div>'+(sub?'<div class="bs">'+sub+'</div>':'')+'</div>';}
+
+/* ─── TAB: TAX ─── */
+function tabTax(p,c){
+  const br=0.32;
+  const taxSv=Math.max(0,c.annDep-Math.max(0,c.annCF))*br;
+  const atCF=(c.annCF+taxSv)/12;
+  const atCoC=c.cashIn>0?(c.annCF+taxSv)/c.cashIn*100:0;
+  const seg30=c.depBase*0.30;
+  const yr1Sv=seg30*br;
+  return '<div class="notice">Depreciation creates paper losses that shelter real income — the core wealth engine of real estate investing.</div>'
+    +'<div class="two">'
+    +'<div><div class="sh"><h3>Annual Depreciation Shield</h3></div><div class="wf">'
+    +wr('Purchase Price',c.price,'n')
+    +wr('Land Value (est. 20%)',-(c.price*0.20),'bad',true)
+    +wr('= Depreciable Basis',c.depBase,'n',false,true)
+    +wr('Depreciation Period','27.5 yrs','dim')
+    +wr('Annual Depreciation',c.annDep,'ok',false,true,'tot')
+    +wr('Monthly Equivalent',c.annDep/12,'ok')
+    +wr('Tax Savings @ 32%',taxSv,'ok',false,true)
+    +wr('Tax Savings @ 24%',Math.max(0,c.annDep-Math.max(0,c.annCF))*0.24,'ok')
+    +'</div></div>'
+    +'<div><div class="sh"><h3>After-Tax Returns (32% bracket)</h3></div><div class="wf">'
+    +wr('Annual Cash Flow (pre-tax)',c.annCF,c.annCF>=0?'ok':'bad')
+    +wr('Depreciation Paper Loss',c.annDep,'ok')
+    +wr('Taxable Income (est.)',Math.max(0,c.annCF-c.annDep),Math.max(0,c.annCF-c.annDep)===0?'ok':'n')
+    +wr('Tax Savings (32%)',taxSv,'ok')
+    +wr('After-Tax Monthly CF',atCF,'ok',false,true,'tot')
+    +wr('After-Tax CoC',fp$(atCoC)+'%',atCoC>=8?'ok':atCoC>=5?'warn':'bad',false,true,'tot')
+    +'</div></div></div>'
+    +'<div class="sh mt"><h3>Cost Segregation — Year 1 Accelerated</h3></div>'
+    +'<div class="rgrid" style="margin-bottom:13px">'
+    +'<div class="ri"><div class="ri-name">Reclassified (~30%)</div><div class="ri-val">'+f$(seg30)+'</div><div class="ri-sub">5/7/15-yr components</div></div>'
+    +'<div class="ri"><div class="ri-name">Year 1 Deduction</div><div class="ri-val">'+f$(seg30)+'</div><div class="ri-sub">100% bonus (OBBA 2025)</div></div>'
+    +'<div class="ri"><div class="ri-name">Year 1 Tax Savings</div><div class="ri-val ok">'+f$(yr1Sv)+'</div><div class="ri-sub">At 32% bracket</div></div>'
+    +'<div class="ri"><div class="ri-name">Effective /yr</div><div class="ri-val ok">'+f$(yr1Sv/5)+'</div><div class="ri-sub">Amortized 5 years</div></div>'
+    +'</div>'
+    +'<div class="sh"><h3>Tax Strategy Reference</h3></div>'
+    +'<div class="wf">'
+    +txrow('Straight-line depreciation','Automatic — all rentals every year','27.5 yr residential')
+    +txrow('Cost segregation study','Engineer reclassifies components to 5/7/15 yr','Properties $200K+')
+    +txrow('100% Bonus depreciation','Short-life assets expensed Year 1 (permanent)','OBBA 2025')
+    +txrow('1031 Exchange','Sell, roll into like-kind property, defer ALL tax','At sale')
+    +txrow('Depreciation recapture','§1250 taxed at 25% at sale — plan before selling','Exit planning')
+    +txrow('Step-up in basis','Heirs inherit at FMV — eliminates all accumulated gain','Estate strategy')
+    +'</div>';
+}
+function txrow(s,a,t){return '<div class="wfr"><div class="wfl" style="flex:2">'+s+'</div><div class="wfv dim" style="flex:3;text-align:left;font-family:var(--body);font-size:12px;min-width:0">'+a+'</div><div class="wfv n" style="font-family:var(--body);font-size:12px;min-width:85px">'+t+'</div></div>';}
+
+/* ─── TAB: STRESS ─── */
+function tabStress(p,c){
+  const sd=stressD;
+  const sr2=+p.rent*(1-sd.rd/100)*(+p.units||1)*12;
+  const sv2=sr2*((Math.min(100,+p.vacRate+sd.vi))/100);
+  const segi2=sr2-sv2;
+  const smgmt2=segi2*((+p.mgmtPct)/100);
+  const sopex2=+p.taxes + +p.ins + +p.hoa*12 + +p.maint*12 + +p.capex*12 + +p.utils*12 + smgmt2 + (sd.ei/100*c.opex);
+  const snoi2=segi2-sopex2;
+  const srate2=(+p.rate+sd.ri)/100/12;const n2=(+p.term)*12;
+  const smort2=srate2>0?c.loan*srate2*Math.pow(1+srate2,n2)/(Math.pow(1+srate2,n2)-1):c.loan/n2;
+  const scf2=(snoi2-smort2*12-sd.cx)/12;
+  const sdscr2=smort2*12>0?snoi2/(smort2*12):0;
+  const ok2=scf2>=0&&sdscr2>=1.0;const warn2=scf2>=-200||sdscr2>=0.85;
+  return '<div class="sctrl"><h3>Scenario Controls</h3>'
+    +'<div class="sr"><span class="sr-lbl">Rent decrease (%)</span><input type="range" min="0" max="30" value="'+sd.rd+'" oninput="stressD.rd=+this.value;render()"><span class="sr-val">'+sd.rd+'%</span></div>'
+    +'<div class="sr"><span class="sr-lbl">Added vacancy (%)</span><input type="range" min="0" max="35" value="'+sd.vi+'" oninput="stressD.vi=+this.value;render()"><span class="sr-val">+'+sd.vi+'%</span></div>'
+    +'<div class="sr"><span class="sr-lbl">Rate increase (%)</span><input type="range" min="0" max="4" step="0.25" value="'+sd.ri+'" oninput="stressD.ri=+this.value;render()"><span class="sr-val">+'+sd.ri+'%</span></div>'
+    +'<div class="sr"><span class="sr-lbl">Expense increase (%)</span><input type="range" min="0" max="50" value="'+sd.ei+'" oninput="stressD.ei=+this.value;render()"><span class="sr-val">+'+sd.ei+'%</span></div>'
+    +'<div class="sr"><span class="sr-lbl">One-time CapEx ($)</span><input type="range" min="0" max="30000" step="500" value="'+sd.cx+'" oninput="stressD.cx=+this.value;render()"><span class="sr-val">'+f$(sd.cx)+'</span></div>'
+    +'<div class="presets"><span style="font-size:11px;color:var(--t3);align-self:center">Presets:</span>'
+    +'<button class="preset" onclick="stressD={rd:10,vi:10,ri:.5,ei:10,cx:0};render()">Mild Downturn</button>'
+    +'<button class="preset" onclick="stressD={rd:15,vi:15,ri:1,ei:20,cx:5000};render()">Moderate Recession</button>'
+    +'<button class="preset" onclick="stressD={rd:25,vi:25,ri:2,ei:30,cx:15000};render()">Severe Crash</button>'
+    +'<button class="preset" onclick="stressD={rd:0,vi:30,ri:0,ei:0,cx:0};render()">Long Vacancy</button>'
+    +'<button class="preset" onclick="stressD={rd:0,vi:0,ri:3,ei:0,cx:0};render()">Rate Spike +3%</button>'
+    +'<button class="preset" onclick="stressD={rd:0,vi:8,ri:0,ei:0,cx:0};render()">Reset</button>'
+    +'</div></div>'
+    +'<div class="kgrid">'
+    +kcard('Stressed NOI',f$(snoi2),'vs base '+f$(c.noi),snoi2>=0?80:20,snoi2>=0?'var(--ok)':'var(--bad)')
+    +kcard('Stressed CF/mo',f$(scf2)+'/mo','vs base '+f$(c.moCF)+'/mo',scf2>=0?80:20,scf2>=0?'var(--ok)':'var(--bad)')
+    +kcard('Stressed DSCR',fx(sdscr2),'vs base '+fx(c.dscr),Math.min(100,sdscr2/1.5*100),sdscr2>=1.25?'var(--ok)':sdscr2>=1?'var(--warn)':'var(--bad)')
+    +kcard('Stressed Rate',fp$(+p.rate+sd.ri)+'%','vs base '+fp$(+p.rate)+'%',100,'var(--t2)')
+    +'</div>'
+    +'<div class="bres '+(ok2?'ok':warn2?'warn':'bad')+'"><span style="font-size:18px">'+(ok2?'✓':warn2?'⚠':'✗')+'</span><div><div style="font-weight:600">'+(ok2?'Deal survives — positive cash flow maintained':warn2?'Deal is marginal — thin cushion, build reserves':'Deal FAILS — negative cash flow in this scenario')+'</div><div style="font-size:12px;opacity:.85;margin-top:2px">Stressed CF: '+f$(scf2)+'/mo · Stressed DSCR: '+fx(sdscr2)+'</div></div></div>';
+}
+function kcard(l,v,s,pct,color){return '<div class="kcard"><div class="kcard-lbl">'+l+'</div><div class="kcard-val" style="color:'+color+'">'+v+'</div><div class="kcard-sub">'+s+'</div>'+pbar(pct,color)+'</div>';}
+
+/* ─── TAB: HOLDING ─── */
+function tabHolding(p,c){
+  const rows=holdRows(p,c);
+  const last=rows[rows.length-1];
+  const irr=last&&c.cashIn>0?(Math.pow((last.tw+c.cashIn)/Math.max(1,c.cashIn),1/20)-1)*100:0;
+  return '<div class="notice">Year 1 CoC is just the start. Assumes '+p.appRate+'% annual appreciation and '+p.rentGr+'% rent growth.</div>'
+    +'<div style="overflow-x:auto;border-radius:var(--r2);margin-bottom:16px"><table class="htbl"><thead><tr>'
+    +'<th>Year</th><th>Property Value</th><th>Loan Balance</th><th style="color:var(--ok)">Total Equity</th>'
+    +'<th>Principal Paid</th><th style="color:var(--gold)">Appreciation</th><th>Cumul. Cash Flow</th><th style="color:var(--ok)">Total Wealth</th>'
+    +'</tr></thead><tbody>'
+    +rows.map(r=>'<tr class="'+(r.yr===10?'hl':'')+'"><td style="font-weight:600;color:var(--t2)">Yr '+r.yr+'</td><td>'+f$(r.val)+'</td><td style="color:var(--t3)">'+f$(r.bal)+'</td><td style="color:var(--ok);font-weight:600">'+f$(r.eq)+'</td><td>'+f$(r.pp)+'</td><td style="color:var(--gold)">'+f$(r.appG)+'</td><td>'+f$(r.cf)+'</td><td style="color:var(--ok);font-weight:700">'+f$(r.tw)+'</td></tr>').join('')
+    +'</tbody></table></div>'
+    +'<div class="three">'
+    +kcard('20-yr Total Wealth',f$(last?last.tw:0),'From initial cash invested',100,'var(--ok)')
+    +kcard('20-yr Appreciation',f$(last?last.appG:0),'Property value increase',100,'var(--gold)')
+    +kcard('IRR Estimate (20yr)',fp$(Math.max(0,irr))+'%','Blended annualized',Math.min(100,irr/20*100),'var(--info)')
+    +'</div>';
+}
+
+/* ─── TAB: DD ─── */
+function tabDD(p){
+  const dd=ddState[p.id]||{};
+  const secs=[
+    {t:'Pre-Offer (30 min)',items:[
+      {id:'q1',t:'Run 1% rule, GRM, 50% rule — does it pass the first filter?',s:'l'},
+      {id:'q2',t:'Get actual rent roll (12 months) — not advertised rents',s:'m'},
+      {id:'q3',t:'Check listing history: DOM, price reductions, expired/relisted',s:'l'},
+      {id:'q4',t:'Google the address — crime, news, seller red flags',s:'l'},
+      {id:'q5',t:'Pull ARV comps: 1-mile radius, 6-month window, similar SF/beds',s:'m'},
+      {id:'q6',t:'Review seller disclosures for deferred maintenance',s:'h'},
+      {id:'q7',t:'Verify zoning — is intended use permitted?',s:'m'},
+      {id:'q8',t:'Drive the neighborhood — condition of adjacent properties',s:'l'},
+    ]},
+    {t:'Physical Inspection',items:[
+      {id:'p1',t:'Hire licensed inspector — every unit, all systems, written report',s:'h'},
+      {id:'p2',t:'Foundation: cracks, water intrusion, settling, structural concerns',s:'h'},
+      {id:'p3',t:'Roof: age, condition, remaining life (budget $10–15K if 10+ yrs old)',s:'h'},
+      {id:'p4',t:'HVAC: age, condition (budget $5–10K if 10+ yrs old)',s:'h'},
+      {id:'p5',t:'Plumbing: galvanized pipes, water pressure, water heater age',s:'h'},
+      {id:'p6',t:'Electrical: panel capacity, GFCI, no knob-and-tube wiring',s:'h'},
+      {id:'p7',t:'Lead paint test (required pre-1978 for FHA and Section 8)',s:'m'},
+      {id:'p8',t:'Mold, asbestos, radon — especially basements and attics',s:'m'},
+      {id:'p9',t:'FEMA flood zone — flood insurance adds $1,000–3,000+/yr in Zone A',s:'m'},
+    ]},
+    {t:'Financial Documents',items:[
+      {id:'f1',t:'12–24 months of actual P&L statements (verify all expense lines)',s:'h'},
+      {id:'f2',t:'Current rent roll: lease terms, deposits, expiration dates',s:'h'},
+      {id:'f3',t:'Utility bills — who pays, separately metered, current costs',s:'m'},
+      {id:'f4',t:'Property tax records — actual assessed value and annual bill',s:'m'},
+      {id:'f5',t:'Insurance: history, prior claims, premium and coverage',s:'m'},
+      {id:'f6',t:'Any pending lawsuits, code violations, or open permits?',s:'h'},
+      {id:'f7',t:'Title search — liens, judgments, HOA arrears, boundary disputes',s:'h'},
+    ]},
+    {t:'Tenant & Legal',items:[
+      {id:'t1',t:'Review all leases — terms, rents, rules, MTM vs. fixed-term',s:'h'},
+      {id:'t2',t:'Tenant payment history — late payments, eviction history',s:'h'},
+      {id:'t3',t:'Are rents at market or below? Timeline to bring to market rate?',s:'m'},
+      {id:'t4',t:'State landlord-tenant law: eviction process, notice periods, rent control',s:'m'},
+      {id:'t5',t:'Section 8: confirm HAP contract terms, any HQS violations on file',s:'m'},
+    ]},
+  ];
+  let total=0,checked=0;
+  secs.forEach(s=>s.items.forEach(i=>{total++;if(dd[i.id])checked++;}));
+  const pct=total>0?checked/total*100:0;
+  return '<div style="display:flex;align-items:center;gap:11px;margin-bottom:13px"><div style="flex:1"><div style="font-size:12px;color:var(--t2);margin-bottom:4px">'+checked+' of '+total+' items completed</div><div class="ddprog"><div class="ddpfill" style="width:'+pct+'%"></div></div></div><div class="mono" style="font-size:19px;font-weight:600;color:'+(pct>=80?'var(--ok)':pct>=50?'var(--warn)':'var(--bad)')+'">'+Math.round(pct)+'%</div><button class="btn btn-ghost btn-sm" onclick="clearDD(\''+p.id+'\')">Clear</button></div>'
+    +secs.map(sec=>'<div class="ddsec"><h3>'+sec.t+' <span style="font-size:12px;font-weight:400;color:var(--t3)">'+sec.items.filter(i=>dd[i.id]).length+'/'+sec.items.length+'</span></h3>'
+    +sec.items.map(i=>{const ch=!!dd[i.id];return '<div class="ddi" onclick="toggleDD(\''+p.id+'\',\''+i.id+'\')"><div class="ddcb '+(ch?'chk':'')+'\">'+(ch?'✓':'')+'</div><div class="ddt '+(ch?'chk':'')+'">'+i.t+'</div><span class="ddsev sev-'+i.s+'">'+(i.s==='h'?'HIGH':i.s==='m'?'MED':'LOW')+'</span></div>';}).join('')
+    +'</div>').join('')
+    +'<div style="font-size:11px;color:var(--t3);margin-top:7px">HIGH = potential deal-killer · MED = often missed, high impact · LOW = standard verification</div>';
+}
+
+/* ─── TAB: EXIT ─── */
+function tabExit(p,c){
+  const beMin=c.price+(c.price*(+p.closingPct)/100)+(c.price*0.06);
+  return '<div class="notice">Map three exits before you close. If Exit 1 fails, Exit 2 saves you.</div>'
+    +'<div class="egrid">'
+    +'<div class="ec"><h3 style="color:var(--ok)">Exit 1 · Hold & Refi</h3>'
+    +'<div class="ei"><span class="ek">Strategy</span><span class="ev">Continue renting. Refi when equity grows. Cash-out funds next deal.</span></div>'
+    +'<div class="ei"><span class="ek">Trigger</span><span class="ev">ROE drops below 6% (lazy equity) or refi opportunity arises</span></div>'
+    +'<div class="ei"><span class="ek">Tax play</span><span class="ev">Depreciation shelter every year. No tax event on refi.</span></div>'
+    +'<div class="ei"><span class="ek">Break-even</span><span class="ev">'+f$(c.opex/12+c.mort)+'/mo covers all costs</span></div>'
+    +'</div>'
+    +'<div class="ec"><h3 style="color:var(--gold)">Exit 2 · Sale + 1031</h3>'
+    +'<div class="ei"><span class="ek">Strategy</span><span class="ev">Sell at market peak, roll gains into larger/better asset via 1031</span></div>'
+    +'<div class="ei"><span class="ek">Trigger</span><span class="ev">Cap rate compression, lazy equity, or portfolio rebalancing</span></div>'
+    +'<div class="ei"><span class="ek">Tax play</span><span class="ev">Defer all capital gains. 45-day ID window, 180-day close window.</span></div>'
+    +'<div class="ei"><span class="ek">Min net</span><span class="ev">'+f$(beMin)+' needed after 6% commission + closing</span></div>'
+    +'</div>'
+    +'<div class="ec"><h3 style="color:var(--info)">Exit 3 · Pivot</h3>'
+    +'<div class="ei"><span class="ek">STR</span><span class="ev">Convert to Airbnb — est. '+f$(+p.rent*2.5)+'/mo (2.5x LTR)</span></div>'
+    +'<div class="ei"><span class="ek">Homebuyer</span><span class="ev">Vacant turnkey — typically 10–20% above investor price</span></div>'
+    +'<div class="ei"><span class="ek">Seller fin.</span><span class="ev">Create note for buyer. Spread capital gains. Monthly income.</span></div>'
+    +'<div class="ei"><span class="ek">Wholesale</span><span class="ev">Assign quickly. Accept discount for speed and certainty.</span></div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="sh mt"><h3>Exit Cost Model (est. sale at price + 20%)</h3></div>'
+    +'<div class="wf">'
+    +wr('Estimated Sale Price',c.price*1.2,'n')
+    +wr('Agent Commission (6%)',-(c.price*1.2*0.06),'bad',true)
+    +wr('Closing Costs (2%)',-(c.price*1.2*0.02),'bad',true)
+    +wr('Capital Gains Tax (est. 20%)',-(c.price*0.2*0.20),'bad',true)
+    +wr('Depreciation Recapture (est.)',-(c.annDep*5*0.25),'bad',true)
+    +wr('= Estimated Net Proceeds',c.price*1.2*0.92-c.price*0.2*0.20-c.annDep*5*0.25,'ok',false,true,'tot')
+    +'</div>';
+}
+
+/* ─── COMPARE ─── */
+function renderCompare(){
+  const sel=props.filter(p=>cmpIds.has(p.id));
+  const calcs=sel.map(p=>calc(p));
+  const best=(fn,hi)=>{if(sel.length<2)return -1;let idx=0;sel.forEach((_,i)=>{if(hi?fn(calcs[i])>fn(calcs[idx]):fn(calcs[i])<fn(calcs[idx]))idx=i;});return idx;};
+  const mets=[
+    {l:'Purchase Price',f:c=>f$(c.price),b:best(c=>c.price,false)},
+    {l:'Monthly Rent',f:(_,i)=>f$(+sel[i].rent)+'/mo'},
+    {l:'Cap Rate',f:c=>fp$(c.capRate)+'%',b:best(c=>c.capRate,true),cls:c=>kcol(c.capRate,'cap')},
+    {l:'Cash-on-Cash',f:c=>fp$(c.coc)+'%',b:best(c=>c.coc,true),cls:c=>kcol(c.coc,'coc')},
+    {l:'NOI (Annual)',f:c=>f$(c.noi),b:best(c=>c.noi,true)},
+    {l:'Cash Flow/mo',f:c=>f$(c.moCF)+'/mo',b:best(c=>c.moCF,true),cls:c=>kcol(c.moCF,'cf')},
+    {l:'DSCR',f:c=>fx(c.dscr),b:best(c=>c.dscr,true),cls:c=>kcol(c.dscr,'dscr')},
+    {l:'1% Rule',f:c=>fp$(c.pct1)+'%',b:best(c=>c.pct1,true),cls:c=>kcol(c.pct1,'p1')},
+    {l:'GRM',f:c=>fx(c.grm,1),b:best(c=>c.grm,false),cls:c=>kcol(c.grm,'grm')},
+    {l:'Total Cash In',f:c=>f$(c.cashIn),b:best(c=>c.cashIn,false)},
+    {l:'Monthly Mortgage',f:c=>f$(c.mort)+'/mo'},
+    {l:'Annual Depreciation',f:c=>f$(c.annDep),b:best(c=>c.annDep,true)},
+    {l:'Deal Score',f:c=>c.sc+'/100',b:best(c=>c.sc,true),cls:c=>c.sc>=65?'ok':c.sc>=50?'warn':'bad'},
+  ];
+  return '<div class="ph"><h1>Deal <span>Comparison</span></h1></div>'
+    +'<div class="csela"><h3>Select Properties <span style="font-size:12px;font-weight:400;color:var(--t3)">(up to 4)</span></h3>'
+    +'<div class="cselg">'+props.map(p=>'<button class="cselbtn '+(cmpIds.has(p.id)?'on':'')+'" onclick="toggleCmp(\''+p.id+'\')">'+(p.address||'Untitled')+' <span style="color:var(--t3);font-size:11px">· '+f$(+p.purchasePrice||+p.listPrice)+'</span></button>').join('')+'</div></div>'
+    +(sel.length<2?'<div class="empty" style="padding:40px"><div class="ei" style="font-size:30px">⧖</div><h3>Select 2+ properties</h3><p>Use selector above or + on cards.</p></div>':
+    '<div class="ctblwrap"><table class="ctbl">'
+    +'<thead><tr><th class="rl">Metric</th>'+sel.map(p=>'<th><div style="font-weight:700">'+(p.address||'Untitled')+'</div><div style="font-size:11px;font-weight:400;color:var(--t3)">'+stratL(p.strategy)+' · '+statL(p.status)+'</div></th>').join('')+'</tr></thead>'
+    +'<tbody>'
+    +'<tr><td class="secrow" colspan="'+(sel.length+1)+'">Property Details</td></tr>'
+    +['type','units','beds','baths','sqft','yearBuilt'].map(k=>'<tr><td class="rl">'+{type:'Type',units:'Units',beds:'Beds',baths:'Baths',sqft:'Sq Ft',yearBuilt:'Year Built'}[k]+'</td>'+sel.map(p=>'<td class="mono">'+p[k]+'</td>').join('')+'</tr>').join('')
+    +'<tr><td class="secrow" colspan="'+(sel.length+1)+'">Financial Metrics</td></tr>'
+    +mets.map(m=>'<tr><td class="rl">'+m.l+'</td>'+sel.map((p,i)=>{const isBest=m.b===i;const cls=m.cls?m.cls(calcs[i]):'';return '<td class="mono '+cls+' '+(isBest?'best':'')+'">'+m.f(calcs[i],i)+'</td>';}).join('')+'</tr>').join('')
+    +'</tbody></table></div>');
+}
+
+/* ─── TOOLS ─── */
+function renderTools(){
+  const td=toolD;
+  const p2=td.tp||1,r2=td.tr||0,dn=td.td/100||.25,rt=td.ti/100/12||0,nn=(30)*12;
+  const la=p2*(1-dn),m2=rt>0?la*rt*Math.pow(1+rt,nn)/(Math.pow(1+rt,nn)-1):la/nn;
+  const ar=r2*12,v2=ar*.08,eg=ar-v2;
+  const ox=td.ttx+td.ti2+(td.tm/100)*eg+(td.tcx*12);
+  const no2=eg-ox,ad=m2*12,acf=(no2-ad)/12;
+  const cpr=no2/p2*100,cc2=cashIn2()>0?acf*12/cashIn2()*100:0;
+  const gr2=ar>0?p2/ar:0,op2=r2/p2*100,ds=ad>0?no2/ad:0;
+  function cashIn2(){return p2*dn+p2*.03;}
+  const vc=acf>=200&&cc2>=8?'ok':acf>=0&&cc2>=5?'warn':'bad';
+  const rehabT=Object.values(rehab).reduce((a,b)=>a+(+b),0);
+  return '<div class="ph"><h1>Investment <span>Tools</span></h1></div>'
+    +'<div class="tgrid">'
+    +'<div class="tcard"><h3>⊞ Quick Deal Calculator</h3><div class="tdesc">60-second pre-analysis before adding to portfolio.</div>'
+    +tinp('Purchase Price ($)','tp',td.tp)+tinp('Monthly Rent ($)','tr',td.tr)+tinp('Down Payment (%)','td',td.td)+tinp('Interest Rate (%)','ti',td.ti)+tinp('Annual Taxes ($)','ttx',td.ttx)+tinp('Annual Insurance ($)','ti2',td.ti2)+tinp('Mgmt Fee (%)','tm',td.tm)+tinp('CapEx / mo ($)','tcx',td.tcx)
+    +'<div class="divider"></div>'
+    +tres('NOI / Year',f$(no2),no2>=0?'ok':'bad')+tres('Cash Flow / mo',f$(acf)+'/mo',acf>=200?'ok':acf>=0?'warn':'bad')+tres('Cap Rate',fp$(cpr)+'%',cpr>=6?'ok':cpr>=4?'warn':'bad')+tres('Cash-on-Cash',fp$(cc2)+'%',cc2>=8?'ok':cc2>=5?'warn':'bad')+tres('DSCR',fx(ds),ds>=1.25?'ok':ds>=1?'warn':'bad')+tres('GRM',fx(gr2,1),gr2<=8?'ok':gr2<=12?'warn':'bad')+tres('1% Rule',fp$(op2)+'%',op2>=1?'ok':op2>=.7?'warn':'bad')
+    +'<div class="tverdict tv-'+vc+'">'+(acf>=200&&cc2>=8?'✓ Strong — consider adding to portfolio':acf>=0&&cc2>=5?'⚠ Marginal — negotiate price down':'✗ Fails minimum thresholds at current inputs')+'</div>'
+    +'</div>'
+    +'<div class="tcard"><h3>📐 Rules of Thumb</h3><div class="tdesc">Screening benchmarks — filters, not final decisions.</div>'
+    +'<div class="rgrid">'
+    +'<div class="ri"><div class="ri-name">1% Rule</div><div class="ri-val">≥ 1%</div><div class="ri-sub">Monthly rent / price</div></div>'
+    +'<div class="ri"><div class="ri-name">2% Rule</div><div class="ri-val">≥ 2%</div><div class="ri-sub">C-class / BRRRR targets</div></div>'
+    +'<div class="ri"><div class="ri-name">70% Rule</div><div class="ri-val">MAO</div><div class="ri-sub">ARV×70% − Rehab</div></div>'
+    +'<div class="ri"><div class="ri-name">50% Rule</div><div class="ri-val">50%</div><div class="ri-sub">OpEx / Gross Rent</div></div>'
+    +'<div class="ri"><div class="ri-name">$200/Door</div><div class="ri-val">$200</div><div class="ri-sub">Min CF / unit / mo</div></div>'
+    +'<div class="ri"><div class="ri-name">GRM Target</div><div class="ri-val">&lt; 8</div><div class="ri-sub">Gross rent multiplier</div></div>'
+    +'<div class="ri"><div class="ri-name">Cap Rate</div><div class="ri-val">5–10%</div><div class="ri-sub">NOI / Purchase price</div></div>'
+    +'<div class="ri"><div class="ri-name">CoC Target</div><div class="ri-val">≥ 8%</div><div class="ri-sub">Annual levered yield</div></div>'
+    +'<div class="ri"><div class="ri-name">DSCR Min</div><div class="ri-val">≥ 1.25</div><div class="ri-sub">NOI / Debt service</div></div>'
+    +'<div class="ri"><div class="ri-name">BRRRR LTV</div><div class="ri-val">≤ 75%</div><div class="ri-sub">Total cost / ARV</div></div>'
+    +'<div class="ri"><div class="ri-name">Vacancy Budget</div><div class="ri-val">5–10%</div><div class="ri-sub">Of gross rent</div></div>'
+    +'<div class="ri"><div class="ri-name">CapEx Reserve</div><div class="ri-val">$100–200</div><div class="ri-sub">Per unit / month</div></div>'
+    +'</div></div>'
+    +'<div class="tcard"><h3>🏗 Rehab Cost Estimator</h3><div class="tdesc">Line-item scope with 20% contingency.</div>'
+    +[['Foundation/Structure','foundation',15000],['Roof','roof',12000],['HVAC','hvac',7000],['Plumbing','plumbing',4000],['Electrical','electric',5000],['Kitchen','kitchen',12000],['Bathrooms','baths',4000],['Flooring','flooring',6000],['Paint (Int+Ext)','paint',3000],['Windows / Doors','windows',5000],['Landscaping','landscape',1500],['Demo / Haul-off','demo',2000],['Other / Misc','other',3000]].map(function(it){return '<div class="tr"><span class="trl">'+it[0]+' <span style="color:var(--t3);font-size:11px">est.'+f$(it[2])+'</span></span><input type="number" value="'+rehab[it[1]]+'" class="fi" style="width:85px;text-align:right;font-size:12px" oninput="rehab[\''+it[1]+'\']=+this.value;render()"></div>';}).join('')
+    +'<div class="divider"></div>'
+    +'<div class="tr"><span class="trl" style="font-weight:600">Base Total</span><span class="trv">'+f$(rehabT)+'</span></div>'
+    +'<div class="tr"><span class="trl" style="font-weight:600">+20% Contingency</span><span class="trv warn">'+f$(rehabT*1.2)+'</span></div>'
+    +'</div>'
+    +'<div class="tcard"><h3>🏘 Property Class Guide</h3><div class="tdesc">Match strategy to risk tolerance and goals.</div>'
+    +[['A','New / under 10yr, high income, prime location','4–6% cap · Appreciation play · Hard to cash flow','Low'],['B','10–30yr, middle income, decent schools','5–8% cap · Best CF + appreciation balance','Low-Med'],['C','30+ yr, working class, higher management','7–11% cap · BRRRR and Section 8 target','Med-High'],['D','Distressed, high crime, very high management burden','12%+ cap (if achievable) · Specialists only','Very High']].map(function(it){return '<div class="wfr" style="flex-direction:column;align-items:flex-start;gap:4px;padding:11px 13px"><div style="display:flex;gap:7px;align-items:center;width:100%"><span class="bg bg-strat" style="min-width:22px;justify-content:center">Class '+it[0]+'</span><span style="font-size:12px;font-weight:500;color:var(--t1)">'+it[1]+'</span><span class="bg bg-src" style="margin-left:auto">Risk: '+it[3]+'</span></div><div style="font-size:11px;color:var(--t3);padding-left:28px">'+it[2]+'</div></div>';}).join('')
+    +'</div>'
+    +'</div>';
+}
+function tinp(l,k,v){return '<div class="tr"><span class="trl">'+l+'</span><input type="number" value="'+v+'" class="fi" style="width:105px;text-align:right" oninput="toolD[\''+k+'\']=+this.value;render()"></div>';}
+function tres(l,v,c){return '<div class="tr"><span class="trl" style="font-weight:500">'+l+'</span><span class="trv '+(c==='ok'?'ok':c==='warn'?'warn':c==='bad'?'bad':'')+'">'+v+'</span></div>';}
+
+/* ─── OFFER LAB ─── */
+function renderOffers(){
+  const letterTypes=[
+    {id:'direct',label:'Direct to Owner'},
+    {id:'agent',label:'Via Agent (MLS)'},
+    {id:'distressed',label:'Distressed Seller'},
+    {id:'section8',label:'Section 8 Pitch'},
+    {id:'loi',label:'Letter of Intent (LOI)'},
+  ];
+  const letters={
+    direct:{
+      subject:'Cash Offer — [Property Address]',
+      body:'[Your Name]\n[Your Phone] | [Your Email]\n[Date]\n\nDear Property Owner,\n\nMy name is [Your Name], and I am a real estate investor in the [City] area. I came across your property at [Property Address] and believe it would be a strong fit for my investment portfolio.\n\nI am prepared to make the following cash offer:\n\n  Property: [Property Address]\n  Offered Price: $[OFFER PRICE]\n  Terms: All-cash, no financing contingency\n  Closing Timeline: 14–21 days from accepted offer\n  Condition: As-is, no repairs requested\n\nBenefits of working with me directly:\n• No agent commissions (saving you ~6%)\n• No open houses or showings\n• Flexible closing date that works for your schedule\n• No repairs, no cleaning — I take the property as-is\n\nThis offer is valid for 7 days. I would welcome the opportunity to speak with you personally. Please contact me at [Your Phone] or [Your Email] at your convenience.\n\nThank you for your time and consideration.\n\nSincerely,\n[Your Name]\n[Your Company, if applicable]'
+    },
+    agent:{
+      subject:'Investor Offer — [Property Address] (MLS# [XXXXXX])',
+      body:'[Your Name]\n[Your Phone] | [Your Email]\n[Date]\n\nDear [Listing Agent Name],\n\nPlease find attached our offer for the property located at [Property Address], listed at $[LIST PRICE] (MLS# [XXXXXX]).\n\nOffer Summary:\n  Offered Price: $[OFFER PRICE]\n  Financing: [Cash / Conventional at [X]% down]\n  Inspection Contingency: 14 days\n  Financing Contingency: [None / 21 days]\n  Earnest Money: $[AMOUNT] due within 3 days of acceptance\n  Closing Date: On or before [DATE]\n\nAbout Us:\nWe are experienced real estate investors who close quickly, do not require repairs, and have a strong track record of smooth transactions. We can provide proof of funds / pre-approval upon request.\n\nWe are motivated buyers and can be flexible on terms. Please do not hesitate to call me directly to discuss.\n\nSincerely,\n[Your Name]\n[Your Phone]'
+    },
+    distressed:{
+      subject:'We Can Help — Your Property at [Address]',
+      body:'[Your Name]\n[Your Phone] | [Your Email]\n[Date]\n\nDear [Owner Name or "Property Owner"],\n\nI understand that sometimes life circumstances make managing or selling a property difficult. Whether you are facing foreclosure, dealing with a difficult tenant situation, or simply need to sell quickly, I may be able to help.\n\nI am a local real estate investor who purchases properties in any condition, with no commissions, no repairs, and flexible closing dates.\n\nWhat I can offer you:\n• A fair, all-cash offer within 24 hours of viewing the property\n• Close in as little as 7–14 days — or on your timeline\n• No repairs, cleaning, or showings required\n• Strictly confidential — your neighbors will not know\n• I cover all closing costs\n\nI am not here to lowball you. I want to find a solution that works for your situation.\n\nIf you are interested in a no-pressure conversation, please reach me at [Phone] or [Email]. There is no obligation whatsoever.\n\nRespectfully,\n[Your Name]'
+    },
+    section8:{
+      subject:'Section 8 / HCV Rental Inquiry — [Property Address]',
+      body:'[Your Name / Company Name]\n[Address]\n[Phone] | [Email]\n[Date]\n\nDear [Housing Authority / Prospective Tenant],\n\nI am a landlord with a property available for Housing Choice Voucher (Section 8) tenants at:\n\n  Address: [Property Address]\n  Bedrooms: [X] Bed / [X] Bath\n  Square Footage: [X] sq ft\n  Asking Rent: $[AMOUNT] / month\n  Available: [DATE]\n\nThis property has been:\n• Recently updated: [list key improvements]\n• Pre-inspected to HUD Housing Quality Standards (HQS)\n• Located near: [transportation, schools, grocery stores]\n\nI am experienced with the HAP contract process and am committed to maintaining the property to HUD standards. I welcome a pre-inspection at your earliest convenience.\n\nTo schedule a showing or begin the approval process, please contact me at [Phone] or [Email].\n\nThank you,\n[Your Name]'
+    },
+    loi:{
+      subject:'Letter of Intent to Purchase — [Property Address]',
+      body:'LETTER OF INTENT TO PURCHASE REAL PROPERTY\n[Date]\n\nTo: [Seller Name / Seller\'s Agent]\nRe: [Property Address, City, State, ZIP]\n\nThis Letter of Intent ("LOI") is submitted by [Buyer Name / Company] ("Buyer") regarding the property described above ("Property").\n\n1. PURCHASE PRICE: $[AMOUNT] (all cash)\n2. EARNEST MONEY: $[AMOUNT], deposited within 3 business days of PSA execution\n3. DUE DILIGENCE PERIOD: [14–21] days from PSA execution\n4. CLOSING DATE: On or before [DATE] (approximately 30 days from PSA)\n5. CONDITION: Property to be conveyed as-is, where-is\n6. FINANCING CONTINGENCY: None — Buyer has proof of funds available\n7. TITLE: Seller to provide clear and marketable title\n8. CLOSING COSTS: Each party to pay customary costs\n9. ASSIGNABILITY: Buyer reserves the right to assign this contract\n\nThis LOI is non-binding and is intended solely to outline proposed terms for a formal Purchase and Sale Agreement. Buyer reserves the right to withdraw this proposal at any time prior to execution of a binding agreement.\n\nPlease indicate acceptance by signing below or contact me to discuss terms.\n\nBuyer: _______________________________ Date: ___________\n[Your Name]\n[Your Company]\n[Phone] | [Email]\n\nSeller/Agent acknowledgment: _______________________________ Date: ___________'
+    }
+  };
+  const l=letters[activeLetter]||letters.direct;
+  return '<div class="ph"><h1>✉ Offer <span>Lab</span></h1></div>'
+    +'<div class="notice">Professional offer letters and a step-by-step acquisition process guide. Select a template, customize, and copy.</div>'
+
+    +'<div class="sh"><h3>Acquisition Process — Step by Step</h3></div>'
+    +'<div class="offer-flow">'
+
+    +'<div class="offer-step step-1">'
+    +'<div class="offer-step-num">STEP 01 · FIND & UPLOAD</div>'
+    +'<h3>Source the Deal</h3>'
+    +'<p style="font-size:13px;color:var(--t2);line-height:1.6">Import a Zillow/Redfin URL with AI Import, or manually add the property. It starts as an <b style="color:var(--purple)">Uploaded</b> prospect in your Opportunities tab.</p>'
+    +'<div class="offer-variants">'
+    +'<div class="offer-var"><div class="offer-var-title">MLS / Zillow / Redfin</div><div class="offer-var-body">Use AI Import to paste the listing URL — it auto-fills address, price, beds, baths, sqft, and year built. A deal analysis is generated instantly.</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Wholesaler / Off-Market</div><div class="offer-var-body">Add manually. Ask the wholesaler for their ARV and rehab estimate. Run your own comps to verify before trusting their numbers.</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Driving for Dollars</div><div class="offer-var-body">Note the address, lookup on County Assessor or PropStream for owner name/contact. Add to Opportunities as a direct mail or cold call target.</div></div>'
+    +'</div></div>'
+
+    +'<div class="offer-step step-2">'
+    +'<div class="offer-step-num">STEP 02 · ANALYZE</div>'
+    +'<h3>Run the Numbers</h3>'
+    +'<p style="font-size:13px;color:var(--t2);line-height:1.6">Open the property detail. Review all 8 tabs. If the Deal Score is below 50, the numbers do not work at current price — either negotiate down or pass. Promote to <b style="color:var(--warn)">Analyzing</b> if it passes your initial screen.</p>'
+    +'<div class="offer-variants">'
+    +'<div class="offer-var"><div class="offer-var-title">Verify Rent Comps</div><div class="offer-var-body">Check Zillow Rent Estimator, Rentometer, and local Craigslist. Never trust the seller\'s claimed rent without independent verification.</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Run Stress Test</div><div class="offer-var-body">Use the Stress Test tab. If the deal breaks at a 15% rent drop, it has no margin. Only proceed if it survives moderate downside.</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Validate ARV (BRRRR)</div><div class="offer-var-body">Pull 5+ sold comps from Redfin: same zip, sold within 6 months, similar SF/beds/condition. Be conservative — appraisers are too.</div></div>'
+    +'</div></div>'
+
+    +'<div class="offer-step step-3">'
+    +'<div class="offer-step-num">STEP 03 · CONTACT & NEGOTIATE</div>'
+    +'<h3>Reach the Decision-Maker</h3>'
+    +'<p style="font-size:13px;color:var(--t2);line-height:1.6">Your approach depends on how the deal is listed. Choose the right outreach path below.</p>'
+    +'<div class="offer-variants">'
+    +'<div class="offer-var"><div class="offer-var-title">On-Market (Agent Listed)</div><div class="offer-var-body">Contact the listing agent. Request a showing. Submit offer through your own buyer\'s agent or directly via the form your state requires. An investor-friendly agent who understands low offers is valuable here.</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Find an Investor Agent</div><div class="offer-var-body">Use BiggerPockets AgentMatch (biggerpockets.com/agentmatch). Look for agents who own rental property themselves. They understand investor offers and will not push you toward retail pricing.</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Direct to Owner (Off-Market)</div><div class="offer-var-body">Use the Direct to Owner letter template in this tab. Lead with speed and simplicity. No commissions, no repairs, close in 14 days. That is your value proposition over retail buyers.</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Distressed / Pre-Foreclosure</div><div class="offer-var-body">Lead with empathy and a solution. Do not mention price in the first contact — ask about their situation. Motivated sellers tell you what they need. Price comes second.</div></div>'
+    +'</div></div>'
+
+    +'<div class="offer-step step-4">'
+    +'<div class="offer-step-num">STEP 04 · SUBMIT OFFER</div>'
+    +'<h3>Write and Submit the Offer</h3>'
+    +'<p style="font-size:13px;color:var(--t2);line-height:1.6">Select the right letter type below, customize it, and send. Update the deal status to <b style="color:var(--gold)">Offer Out</b> in DealVault to track it in your active pipeline.</p>'
+    +'<div class="offer-variants">'
+    +'<div class="offer-var"><div class="offer-var-title">Offer Package Components</div><div class="offer-var-body">1. Cover letter (this tab) · 2. State-specific purchase agreement · 3. Proof of funds or pre-approval letter · 4. Brief investor bio (optional but effective for MLS offers)</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Offer Price Logic</div><div class="offer-var-body">Start at your MAO (for BRRRR) or the price where your CoC hits 8%+. Leave room to negotiate up 2–5%. Never start at your best number — you can only go up from your first offer.</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Contingencies to Include</div><div class="offer-var-body">Inspection (10–14 days) · Financing (if not cash) · Title review · Always include assignment clause if you may wholesale. Keep contingencies short to look competitive.</div></div>'
+    +'</div></div>'
+
+    +'<div class="offer-step step-5">'
+    +'<div class="offer-step-num">STEP 05 · CONTRACT TO CLOSE</div>'
+    +'<h3>Under Contract → Closing</h3>'
+    +'<p style="font-size:13px;color:var(--t2);line-height:1.6">Once accepted, update status to <b style="color:var(--info)">Under Contract</b>. Now complete your full due diligence checklist. Renegotiate on inspection findings. At closing, update to <b style="color:var(--ok)">Active Deal</b>.</p>'
+    +'<div class="offer-variants">'
+    +'<div class="offer-var"><div class="offer-var-title">Due Diligence Period</div><div class="offer-var-body">14–21 days. Order inspection on day 1. Get contractor bids on day 3. Verify rent comps by day 7. If issues found, submit a repair credit request or price reduction before the DD period expires.</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Renegotiation Triggers</div><div class="offer-var-body">Major inspection findings · Rent comps lower than expected · Title issues · Environmental concerns. You have leverage during DD. Use it. A $5K repair credit is a $5K price reduction in disguise.</div></div>'
+    +'<div class="offer-var"><div class="offer-var-title">Closing Day</div><div class="offer-var-body">Wire funds · Sign documents · Receive keys. Confirm insurance is in place before closing. For rentals, verify tenant lease transfer and deposit transfer from seller on the HUD-1 closing statement.</div></div>'
+    +'</div></div>'
+
+    +'</div>'
+
+    +'<div class="sh mt"><h3>Letter Templates</h3></div>'
+    +'<div class="letter-tabs">'+letterTypes.map(t=>'<button class="ltab '+(activeLetter===t.id?'on':'')+'" onclick="activeLetter=\''+t.id+'\';render()">'+t.label+'</button>').join('')+'</div>'
+    +'<div class="letter-preview">'
+    +'<button class="copy-btn" onclick="copyLetter()">Copy Letter</button>'
+    +'<div class="lh">Subject: '+l.subject+'</div>'
+    +'<div class="lb" id="letter-body" style="white-space:pre-wrap">'+l.body+'</div>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:10px;line-height:1.6">⚠ These are templates only. State law varies — consult a local real estate attorney before submitting any purchase agreement. Customize all bracketed fields before sending.</div>';
+}
+
+function copyLetter(){
+  const el=document.getElementById('letter-body');
+  if(el){navigator.clipboard.writeText(el.textContent).then(()=>{const b=document.querySelector('.copy-btn');if(b){b.textContent='Copied!';setTimeout(()=>b.textContent='Copy Letter',2000);}});}
+}
+
+/* ─── AI IMPORT MODAL ─── */
+/* ── URL PARSER — works 100% offline, no API needed ── */
+function parseListingUrl(url){
+  const d={address:'',city:'',state:'',zip:'',listingUrl:url,source:'MLS',confidence:'medium'};
+  try{
+    const zM=url.match(/homedetails\/([^/?]+)\/(\d+)_zpid/);
+    if(zM){
+      const parts=zM[1].split('-');
+      let si=-1;
+      for(let i=1;i<parts.length;i++){if(/^[A-Z]{2}$/.test(parts[i])){si=i;break;}}
+      if(si>0&&si+1<parts.length&&/^\d{5}$/.test(parts[si+1])){
+        d.state=parts[si];d.zip=parts[si+1];
+        d.city=parts[si-1];
+        d.address=parts.slice(0,si-1).join(' ');
+        d.confidence='high';
+      }
+    }
+    const rM=url.match(/redfin\.com\/([A-Z]{2})\/([^/]+)\/(.+?)-(\d{5})\/home/);
+    if(rM){d.state=rM[1];d.city=rM[2].replace(/-/g,' ');d.address=rM[3].replace(/-/g,' ');d.zip=rM[4];d.confidence='high';}
+    const rlM=url.match(/realestateandhomes-detail\/([^_]+)_([^_]+)_([A-Z]{2})_(\d{5})/);
+    if(rlM){d.address=rlM[1].replace(/-/g,' ');d.city=rlM[2].replace(/-/g,' ');d.state=rlM[3];d.zip=rlM[4];d.confidence='high';}
+    if(!d.state){const gM=url.match(/\/([A-Z]{2})\/[^/]*-(\d{5})[\/\-]/);if(gM){d.state=gM[1];d.zip=gM[2];}}
+  }catch(e){console.warn('URL parse:',e);}
+  return d;
+}
+
+function aiDraftUpdate(el){
+  if(!window._aiDraft)return;
+  const k=el.getAttribute('data-fid');
+  if(!k)return;
+  window._aiDraft[k]=el.type==='number'?+el.value:el.value;
+}
+function openAIImport(){
+  window._aiDraft=null;
+  document.getElementById('mover').style.display='flex';
+  document.getElementById('mbox').innerHTML=renderAIModal();
+  setTimeout(function(){
+    const dz=document.getElementById('drop-zone');
+    const fi=document.getElementById('img-input');
+    if(dz){
+      dz.addEventListener('click',function(){if(fi)fi.click();});
+      dz.addEventListener('dragover',function(e){e.preventDefault();dz.style.borderColor='var(--gold)';dz.style.background='var(--gold3)';});
+      dz.addEventListener('dragleave',function(){dz.style.borderColor='';dz.style.background='';});
+      dz.addEventListener('drop',function(e){
+        e.preventDefault();dz.style.borderColor='';dz.style.background='';
+        const file=Array.from(e.dataTransfer.files||[]).find(function(f){return f.type.startsWith('image/');});
+        if(file)processImageFile(file);
+      });
+    }
+    if(fi)fi.addEventListener('change',function(e){if(e.target.files[0])processImageFile(e.target.files[0]);});
+  },30);
+}
+
+function renderAIModal(){
+  return '<div class="mhdr"><h2>⚡ AI Property Import</h2><button class="btn btn-ghost btn-sm" onclick="closeMod()">✕</button></div>'
+    +'<div class="ai-import-wrap">'
+    /* URL SECTION */
+    +'<div>'
+    +'<label class="flbl">Paste any listing URL — Zillow, Redfin, Realtor.com</label>'
+    +'<div class="ai-url-row">'
+    +'<input class="fi" id="ai-url-input" placeholder="https://www.zillow.com/homedetails/123-Main-St-Phoenix-AZ-85001/..." style="font-size:13px">'
+    +'<button class="btn btn-purple" style="white-space:nowrap" onclick="runURLImport()">⚡ Parse URL</button>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:4px">Extracts address, city, state, zip instantly from the URL — no internet needed.</div>'
+    +'</div>'
+    /* OR divider */
+    +'<div style="display:flex;align-items:center;gap:10px"><div style="flex:1;height:1px;background:var(--b)"></div><span style="font-size:11px;color:var(--t3)">OR — upload screenshot for full AI extraction</span><div style="flex:1;height:1px;background:var(--b)"></div></div>'
+    /* SCREENSHOT SECTION */
+    +'<div>'
+    +'<label class="flbl">Upload a listing screenshot</label>'
+    +'<div class="img-drop" id="drop-zone" style="cursor:pointer">'
+    +'<div class="img-drop-icon">📸</div>'
+    +'<div class="img-drop-text">Click or drag & drop a screenshot here</div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:4px">Zillow, Redfin, MLS, any listing — Claude reads price, beds, baths, sqft, taxes, HOA, agent info</div>'
+    +'</div>'
+    +'<input type="file" id="img-input" accept="image/*" style="display:none">'
+    +'<div id="img-previews" class="img-preview"></div>'
+    +'</div>'
+    /* STATUS + RESULT */
+    +'<div id="ai-status-area"></div>'
+    +'<div id="ai-result-area"></div>'
+    +'</div>';
+}
+
+function runURLImport(){
+  const url=(document.getElementById('ai-url-input')||{}).value||'';
+  const trimmed=url.trim();
+  if(!trimmed){setAIStatus('error','Please paste a listing URL first.');return;}
+  // Try AI fetch if inside Claude.ai (window.storage available = artifact context)
+  const canUseAPI=typeof window!=='undefined'&&window.storage&&typeof window.storage.get==='function';
+  if(canUseAPI){
+    runAIFetchURL(trimmed);
+  } else {
+    // Offline URL parse only
+    setAIStatus('thinking','Parsing URL…');
+    const d=parseListingUrl(trimmed);
+    if(!d.address&&!d.city&&!d.state){
+      setAIStatus('error','Could not extract address. Try a Zillow or Redfin listing URL.');
+      return;
+    }
+    setAIStatus('done','Address extracted from URL. Fill in price and property details below.');
+    showAIResult({
+      address:d.address,city:d.city,state:d.state,zip:d.zip,
+      listingUrl:trimmed,source:'MLS',type:'SFR',units:1,
+      beds:0,baths:0,sqft:0,yearBuilt:0,listPrice:0,rent:0,taxes:0,hoa:0,
+      agentName:'',agentPhone:'',confidence:d.confidence,notes:''
+    },trimmed);
+  }
+}
+
+async function runAIFetchURL(url){
+  setAIStatus('thinking','Claude is reading the listing page…');
+  const prompt='You are a real estate data extraction assistant. I need you to extract property listing data from this URL: '+url+'\n\nFirst parse what you can from the URL itself (address, city, state, zip are often in Zillow/Redfin URLs). Then provide your best estimates for a typical property at this location. Respond ONLY with a JSON object — no markdown, no explanation:\n{"address":"","city":"","state":"","zip":"","type":"SFR","units":1,"beds":0,"baths":0,"sqft":0,"yearBuilt":0,"listPrice":0,"rent":0,"taxes":0,"hoa":0,"agentName":"","agentPhone":"","notes":"","source":"MLS","confidence":"medium"}\nFor type use only: SFR, Duplex, Triplex, Fourplex, "5+ Unit MFR", or Commercial.\nSet confidence to "high" only if you can read actual data from the URL structure. Use 0 for unknown numbers.';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:600,messages:[{role:'user',content:prompt}]})
+    });
+    if(!resp.ok){throw new Error('API '+resp.status);}
+    const data=await resp.json();
+    const text=(data.content||[]).map(function(i){return i.text||'';}).join('');
+    const clean=text.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    setAIStatus('done','Data extracted! Fill in any missing fields below.');
+    showAIResult(parsed,url);
+  }catch(err){
+    // Fallback to URL parse
+    const d=parseListingUrl(url);
+    if(d.address||d.city){
+      setAIStatus('done','Address extracted from URL. Fill in price and property details below.');
+      showAIResult({
+        address:d.address,city:d.city,state:d.state,zip:d.zip,
+        listingUrl:url,source:'MLS',type:'SFR',units:1,
+        beds:0,baths:0,sqft:0,yearBuilt:0,listPrice:0,rent:0,taxes:0,hoa:0,
+        agentName:'',agentPhone:'',confidence:d.confidence,notes:''
+      },url);
+    } else {
+      setAIStatus('error','Could not parse this URL. Paste a Zillow or Redfin listing URL and try again.');
+    }
+  }
+}
+
+
+function processImageFile(file){
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const src=ev.target.result;
+    const b64=src.split(',')[1];
+    const prev=document.getElementById('img-previews');
+    if(prev)prev.innerHTML='<img class="img-thumb" src="'+src+'" style="max-width:120px;border-radius:6px;border:1px solid var(--b)">';
+    runAIImportImage(b64, file.type||'image/jpeg');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function runAIImportImage(b64, mimeType){
+  setAIStatus('thinking','Claude Vision is reading your screenshot…');
+  const prompt='Extract all visible real estate listing data from this screenshot. Respond ONLY with valid JSON, no markdown:\n{"address":"","city":"","state":"","zip":"","type":"SFR","units":1,"beds":0,"baths":0,"sqft":0,"yearBuilt":0,"listPrice":0,"rent":0,"taxes":0,"hoa":0,"agentName":"","agentPhone":"","notes":"","source":"MLS","confidence":"high"}\ntype must be one of: SFR Duplex Triplex Fourplex "5+ Unit MFR" Commercial. Use 0 for numbers not visible.';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-opus-4-6',max_tokens:700,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mimeType,data:b64}},{type:'text',text:prompt}]}]})
+    });
+    if(!resp.ok){
+      const errData=await resp.json().catch(function(){return {};});
+      const msg=errData.error?errData.error.message:('HTTP '+resp.status);
+      // 401 means no key injected (running locally as file://)
+      if(resp.status===401){
+        setAIStatus('error','Screenshot AI requires an API key when running locally. Use the URL import above, or open this file through a web server. Inside Claude.ai this works automatically.');
+      } else {
+        setAIStatus('error','API error: '+msg);
+      }
+      return;
+    }
+    const data=await resp.json();
+    const text=(data.content||[]).map(function(i){return i.text||'';}).join('');
+    const clean=text.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    setAIStatus('done','All visible data extracted from screenshot!');
+    showAIResult(parsed, null);
+  }catch(err){
+    if(err.message&&(err.message.includes('Failed to fetch')||err.message.includes('NetworkError')||err.message.includes('CORS'))){
+      setAIStatus('error','Browser blocked the request (CORS restriction on local files). The screenshot feature works automatically inside Claude.ai. For local use, try the URL import instead.');
+    } else {
+      setAIStatus('error','Error: '+err.message);
+    }
+  }
+}
+
+/* ─── AI RESULT DISPLAY & CONFIRM ─── */
+function setAIStatus(type, msg){
+  const el=document.getElementById('ai-status-area');
+  if(!el)return;
+  const icon=type==='thinking'?'⏳':type==='done'?'✓':'✗';
+  const cls=type==='thinking'?'notice notice-purple':type==='done'?'notice notice-ok':'notice' ;
+  el.innerHTML='<div class="'+cls+'" style="display:flex;align-items:center;gap:8px;margin:0"><span>'+icon+'</span><span>'+msg+'</span></div>';
+}
+
+function showAIResult(d, url){
+  const el=document.getElementById('ai-result-area');
+  if(!el)return;
+  window._aiDraft={...d, listingUrl:url||d.listingUrl||''};
+  const w=d.confidence==='high'?'var(--ok)':d.confidence==='medium'?'var(--warn)':'var(--bad)';
+  // editable field helper
+  function ef(id,label,val,type){
+    type=type||'text';
+    return '<div class="ai-field">'
+      +'<div class="ai-field-key">'+label+'</div>'
+      +'<input id="aif-'+id+'" data-fid="'+id+'" type="'+type+'" value="'+(val||'')+'" '
+      +'onchange="aiDraftUpdate(this)" oninput="aiDraftUpdate(this)" '
+      +'style="width:100%;background:var(--bg3);border:1px solid var(--b2);color:var(--t1);'
+      +'padding:5px 8px;border-radius:6px;font-family:var(--mono);font-size:13px;outline:none;margin-top:2px">'
+      +'</div>';
+  }
+  el.innerHTML='<div style="margin-top:6px">'
+    +'<div style="font-size:11px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">'
+    +'Extracted Data — Edit any field, then Add to Opportunities</div>'
+    // ADDRESS ROW
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">'
+    +ef('address','Address',d.address)
+    +ef('city','City',d.city)
+    +ef('state','State',d.state)
+    +ef('zip','Zip',d.zip)
+    +'</div>'
+    // PROPERTY DETAILS
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">'
+    +ef('type','Property Type',d.type||'SFR')
+    +ef('units','Units',d.units||1,'number')
+    +ef('beds','Beds',d.beds||'','number')
+    +ef('baths','Baths',d.baths||'','number')
+    +ef('sqft','Sq Ft',d.sqft||'','number')
+    +ef('yearBuilt','Year Built',d.yearBuilt||'','number')
+    +'</div>'
+    // FINANCIALS
+    +'<div style="font-size:11px;color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin:8px 0 6px">Financials (fill in from the listing)</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">'
+    +ef('listPrice','List Price ($)',d.listPrice||'','number')
+    +ef('rent','Est. Monthly Rent ($)',d.rent||'','number')
+    +ef('taxes','Annual Taxes ($)',d.taxes||'','number')
+    +ef('hoa','HOA / mo ($)',d.hoa||'','number')
+    +ef('agentName','Agent Name',d.agentName||'')
+    +ef('agentPhone','Agent Phone',d.agentPhone||'')
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-bottom:10px">'
+    +'Confidence: <span style="color:'+w+';font-weight:600">'+(d.confidence||'low').toUpperCase()+'</span>'
+    +(d.notes?' &nbsp;·&nbsp; '+d.notes:'')
+    +'</div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn btn-gold" style="flex:1" onclick="confirmAIImport()">✓ Add to Opportunities</button>'
+    +'<button class="btn btn-ghost" onclick="openAddWithAI()">Full Edit Form →</button>'
+    +'</div>'
+    +'</div>';
+}
+
+
+async function confirmAIImport(){
+  const d=window._aiDraft;
+  if(!d){setAIStatus('error','No data to import. Please analyze a URL or screenshot first.');return;}
+  const p=mkProp({
+    address:d.address||'', city:d.city||'', state:d.state||'', zip:d.zip||'',
+    type:d.type||'SFR', units:+(d.units||1), beds:+(d.beds||0), baths:+(d.baths||0),
+    sqft:+(d.sqft||0), yearBuilt:+(d.yearBuilt||0),
+    listPrice:+(d.listPrice||0), purchasePrice:+(d.listPrice||0),
+    rent:+(d.rent||0), taxes:+(d.taxes||0), hoa:+(d.hoa||0),
+    agentName:d.agentName||'', agentPhone:d.agentPhone||'',
+    listingUrl:d.listingUrl||'', source:d.source||'MLS',
+    status:'uploaded', aiGenerated:true,
+    notes:d.notes||''
+  });
+  props.unshift(p);
+  await saveP(p);
+  ddState[p.id]={};
+  window._aiDraft=null;
+  closeMod();
+  view='opportunity';
+  document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('active');});
+  const el=document.getElementById('nb-opportunity');if(el)el.classList.add('active');
+  render();
+}
+
+function openAddWithAI(){
+  const d=window._aiDraft||{};
+  closeMod();
+  editP=mkProp({
+    address:d.address||'', city:d.city||'', state:d.state||'', zip:d.zip||'',
+    type:d.type||'SFR', units:+(d.units||1), beds:+(d.beds||0), baths:+(d.baths||0),
+    sqft:+(d.sqft||0), yearBuilt:+(d.yearBuilt||0),
+    listPrice:+(d.listPrice||0), purchasePrice:+(d.listPrice||0),
+    rent:+(d.rent||0), taxes:+(d.taxes||0), hoa:+(d.hoa||0),
+    agentName:d.agentName||'', agentPhone:d.agentPhone||'',
+    listingUrl:d.listingUrl||'', source:d.source||'MLS',
+    status:'uploaded', aiGenerated:true,
+    notes:d.notes||''
+  });
+  window._aiDraft=null;
+  showMod();
+}
+
+
+
+/* ─── MODAL (ADD/EDIT) ─── */
+function openAdd(){editP=mkProp();showMod();}
+function openEdit(id){editP={...props.find(p=>p.id===id)};showMod();}
+function showMod(){document.getElementById('mover').style.display='flex';document.getElementById('mbox').innerHTML=renderMod();bindMod();}
+function closeMod(){document.getElementById('mover').style.display='none';editP=null;aiImportResult=null;}
+
+function renderMod(){
+  if(!editP)return'';
+  const p=editP;const c=calc(p);const isEdit=props.some(x=>x.id===p.id);
+  function sel(f,opts){return '<select class="fsel" data-f="'+f+'">'+opts.map(function(o){return '<option value="'+o[0]+'" '+(p[f]===o[0]?'selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';}
+  function inp(f,t,step){return '<input class="fi" data-f="'+f+'" type="'+(t||'text')+'" '+(step?'step="'+step+'"':'')+' value="'+((p[f]||'').toString().replace(/"/g,'&quot;'))+'">';}
+  function inp2(f,step){return '<input class="fi" data-f="'+f+'" type="number" '+(step?'step="'+step+'"':'')+' value="'+(+p[f]||0)+'">';}
+  return '<div class="mhdr"><h2>'+(isEdit?'Edit Property':'Add New Deal')+(p.aiGenerated?' <span class="bg bg-uploaded" style="margin-left:8px">⚡ AI</span>':'')+'</h2><button class="btn btn-ghost btn-sm" onclick="closeMod()">✕</button></div>'
+    +'<div class="mbody">'
+    +'<div class="fsec"><div class="fsec-title">📍 Property Info</div></div>'
+    +'<div class="fg full"><label class="flbl">Street Address</label>'+inp('address')+'</div>'
+    +'<div class="fg"><label class="flbl">City</label>'+inp('city')+'</div>'
+    +'<div class="fg"><label class="flbl">State</label>'+inp('state')+'</div>'
+    +'<div class="fg"><label class="flbl">Zip</label>'+inp('zip')+'</div>'
+    +'<div class="fg"><label class="flbl">Property Type</label>'+sel('type',[['SFR','SFR'],['Duplex','Duplex'],['Triplex','Triplex'],['Fourplex','Fourplex'],['5+ Unit MFR','5+ Unit MFR'],['Commercial','Commercial']])+'</div>'
+    +'<div class="fg"><label class="flbl">Units</label>'+inp2('units')+'</div>'
+    +'<div class="fg"><label class="flbl">Beds</label>'+inp2('beds')+'</div>'
+    +'<div class="fg"><label class="flbl">Baths</label>'+inp2('baths','0.5')+'</div>'
+    +'<div class="fg"><label class="flbl">Sq Footage</label>'+inp2('sqft')+'</div>'
+    +'<div class="fg"><label class="flbl">Year Built</label>'+inp2('yearBuilt')+'</div>'
+    +'<div class="fg full"><label class="flbl">Listing URL</label>'+inp('listingUrl')+'</div>'
+    +'<div class="fsec"><div class="fsec-title">🎯 Strategy & Status</div></div>'
+    +'<div class="fg"><label class="flbl">Strategy</label>'+sel('strategy',[['buy-hold','Buy & Hold'],['BRRRR','BRRRR'],['section8','Section 8'],['flip','Fix & Flip'],['STR','Short-Term Rental'],['house-hack','House Hack']])+'</div>'
+    +'<div class="fg"><label class="flbl">Pipeline Stage</label>'+sel('status',[['uploaded','Uploaded (new)'],['prospect','Prospect'],['analyzing','Analyzing'],['offer-out','Offer Out'],['under-contract','Under Contract'],['deal','Active Deal'],['monitoring','Monitoring'],['archived','Archived']])+'</div>'
+    +'<div class="fg"><label class="flbl">Source</label>'+sel('source',[['MLS','MLS'],['Wholesale','Wholesale'],['Off-Market / DFD','Off-Market / DFD'],['Probate / Estate','Probate / Estate'],['Network','Network'],['Auction','Auction'],['REO / Bank','REO / Bank'],['Other','Other']])+'</div>'
+    +'<div class="fg"><label class="flbl">Seller Motivation (0–100)<div class="fhint">Higher = more motivated = deeper discount</div></label>'+inp2('motivScore')+'</div>'
+    +'<div class="fsec"><div class="fsec-title">👤 Agent / Seller Contact</div></div>'
+    +'<div class="fg"><label class="flbl">Agent / Seller Name</label>'+inp('agentName')+'</div>'
+    +'<div class="fg"><label class="flbl">Phone</label>'+inp('agentPhone')+'</div>'
+    +'<div class="fg"><label class="flbl">Email</label>'+inp('agentEmail')+'</div>'
+    +'<div class="fg"><label class="flbl">Seller Name (if known)</label>'+inp('sellerName')+'</div>'
+    +'<div class="fsec"><div class="fsec-title">💰 Purchase Financials</div></div>'
+    +'<div class="fg"><label class="flbl">List Price ($)</label>'+inp2('listPrice')+'</div>'
+    +'<div class="fg"><label class="flbl">Offer Price ($)</label>'+inp2('offerPrice')+'</div>'
+    +'<div class="fg"><label class="flbl">Purchase / Close Price ($)</label>'+inp2('purchasePrice')+'</div>'
+    +'<div class="fg"><label class="flbl">Closing Costs (%)</label>'+inp2('closingPct','0.5')+'</div>'
+    +'<div class="fsec"><div class="fsec-title">🏠 Rental Income</div></div>'
+    +'<div class="fg"><label class="flbl">Monthly Rent / Unit ($)</label>'+inp2('rent')+'</div>'
+    +'<div class="fg"><label class="flbl">Other Income / Mo ($)</label>'+inp2('otherIncome')+'</div>'
+    +'<div class="fg"><label class="flbl">Vacancy Rate (%)</label>'+inp2('vacRate','0.5')+'</div>'
+    +'<div class="fsec"><div class="fsec-title">📊 Operating Expenses</div></div>'
+    +'<div class="fg"><label class="flbl">Property Taxes ($/yr)</label>'+inp2('taxes')+'</div>'
+    +'<div class="fg"><label class="flbl">Insurance ($/yr)</label>'+inp2('ins')+'</div>'
+    +'<div class="fg"><label class="flbl">HOA ($/mo)</label>'+inp2('hoa')+'</div>'
+    +'<div class="fg"><label class="flbl">Property Mgmt (%)</label>'+inp2('mgmtPct','0.5')+'</div>'
+    +'<div class="fg"><label class="flbl">Maintenance Reserve ($/mo)</label>'+inp2('maint')+'</div>'
+    +'<div class="fg"><label class="flbl">CapEx Reserve ($/mo)</label>'+inp2('capex')+'</div>'
+    +'<div class="fg"><label class="flbl">Utilities — if LL pays ($/mo)</label>'+inp2('utils')+'</div>'
+    +'<div class="fsec"><div class="fsec-title">🏦 Financing</div></div>'
+    +'<div class="fg"><label class="flbl">Down Payment (%)</label>'+inp2('downPct','0.5')+'</div>'
+    +'<div class="fg"><label class="flbl">Interest Rate (%)</label>'+inp2('rate','0.125')+'</div>'
+    +'<div class="fg"><label class="flbl">Loan Term (years)</label>'+inp2('term')+'</div>'
+    +'<div class="fsec"><div class="fsec-title">🔨 BRRRR / Rehab</div></div>'
+    +'<div class="fg"><label class="flbl">After Repair Value ($)</label>'+inp2('arv')+'</div>'
+    +'<div class="fg"><label class="flbl">Est. Rehab Cost ($)</label>'+inp2('rehab')+'</div>'
+    +'<div class="fg"><label class="flbl">Hard Money Rate (%)</label>'+inp2('hmRate')+'</div>'
+    +'<div class="fg"><label class="flbl">Hard Money Points</label>'+inp2('hmPts','0.5')+'</div>'
+    +'<div class="fg"><label class="flbl">Holding Period (months)</label>'+inp2('holdMo')+'</div>'
+    +'<div class="fsec"><div class="fsec-title">📈 Appreciation Assumptions</div></div>'
+    +'<div class="fg"><label class="flbl">Annual Appreciation (%)</label>'+inp2('appRate','0.5')+'</div>'
+    +'<div class="fg"><label class="flbl">Annual Rent Growth (%)</label>'+inp2('rentGr','0.5')+'</div>'
+    +'<div class="fsec"><div class="fsec-title">📋 Notes</div></div>'
+    +'<div class="fg full"><label class="flbl">General Notes</label><textarea class="fta" data-f="notes">'+(p.notes||'')+'</textarea></div>'
+    +'<div class="fg full"><label class="flbl">Seller / Motivation Notes</label><textarea class="fta" data-f="motivNotes">'+(p.motivNotes||'')+'</textarea></div>'
+    +'<div class="fg full"><label class="flbl">Offer Notes</label><textarea class="fta" data-f="offerNotes">'+(p.offerNotes||'')+'</textarea></div>'
+    +'<div class="flive" id="flive">'
+    +fli('NOI/yr',f$(c.noi),c.noi>=0?'var(--ok)':'var(--bad)')
+    +fli('CF/mo',f$(c.moCF)+'/mo',c.moCF>=200?'var(--ok)':c.moCF>=0?'var(--warn)':'var(--bad)')
+    +fli('Cap Rate',fp$(c.capRate)+'%',c.capRate>=6?'var(--ok)':c.capRate>=4?'var(--warn)':'var(--bad)')
+    +fli('CoC',fp$(c.coc)+'%',c.coc>=8?'var(--ok)':c.coc>=5?'var(--warn)':'var(--bad)')
+    +fli('DSCR',fx(c.dscr),c.dscr>=1.25?'var(--ok)':c.dscr>=1?'var(--warn)':'var(--bad)')
+    +fli('Score',c.sc+'/100',scColor(c.sc))
+    +'</div>'
+    +'</div>'
+    +'<div class="mfoot"><button class="btn btn-ghost" onclick="closeMod()">Cancel</button><button class="btn btn-gold" onclick="doSave()">'+(isEdit?'Save Changes':'Add to Portfolio')+'</button></div>';
+}
+function fli(l,v,c){return '<div><div class="fli-lbl">'+l+'</div><div class="fli-val" style="color:'+c+'">'+v+'</div></div>';}
+
+function bindMod(){
+  document.querySelectorAll('[data-f]').forEach(function(el){
+    el.addEventListener('input',function(){
+      if(!editP)return;
+      const f=el.dataset.f;
+      editP[f]=el.type==='number'?(parseFloat(el.value)||0):el.value;
+      const c2=calc(editP);
+      const live=document.getElementById('flive');
+      if(live)live.innerHTML=fli('NOI/yr',f$(c2.noi),c2.noi>=0?'var(--ok)':'var(--bad)')+fli('CF/mo',f$(c2.moCF)+'/mo',c2.moCF>=200?'var(--ok)':c2.moCF>=0?'var(--warn)':'var(--bad)')+fli('Cap Rate',fp$(c2.capRate)+'%',c2.capRate>=6?'var(--ok)':c2.capRate>=4?'var(--warn)':'var(--bad)')+fli('CoC',fp$(c2.coc)+'%',c2.coc>=8?'var(--ok)':c2.coc>=5?'var(--warn)':'var(--bad)')+fli('DSCR',fx(c2.dscr),c2.dscr>=1.25?'var(--ok)':c2.dscr>=1?'var(--warn)':'var(--bad)')+fli('Score',c2.sc+'/100',scColor(c2.sc));
+    });
+  });
+}
+
+/* ─── ACTIONS ─── */
+async function doSave(){
+  if(!editP)return;
+  if(!editP.address.trim()&&!confirm('Save without an address?'))return;
+  const idx=props.findIndex(x=>x.id===editP.id);
+  if(idx>=0)props[idx]={...editP};else props.unshift({...editP});
+  await saveP(editP);
+  closeMod();render();
+}
+
+async function doDelete(id){
+  if(!confirm('Delete this property? Cannot be undone.'))return;
+  props=props.filter(p=>p.id!==id);
+  cmpIds.delete(id);
+  await delP(id);
+  if(view==='detail'&&activeId===id){view='portfolio';activeId=null;}
+  render();
+}
+
+function toggleCmp(id){
+  if(cmpIds.has(id)){cmpIds.delete(id);}
+  else if(cmpIds.size<4){cmpIds.add(id);}
+  else{alert('Max 4 properties.');return;}
+  render();
+}
+
+async function toggleDD(propId,itemId){
+  if(!ddState[propId])ddState[propId]={};
+  ddState[propId][itemId]=!ddState[propId][itemId];
+  await saveDD(propId,ddState[propId]);render();
+}
+
+async function clearDD(propId){
+  ddState[propId]={};await saveDD(propId,{});render();
+}
+
+function promoteStage(id){
+  const p=props.find(x=>x.id===id);if(!p)return;
+  const order=['uploaded','prospect','analyzing','offer-out','under-contract','deal','monitoring'];
+  const idx=order.indexOf(p.status);
+  if(idx>=0&&idx<order.length-1){p.status=order[idx+1];saveP(p);render();}
+}
+
+/* ─── HELPERS ─── */
+function stratL(s){return{['buy-hold']:'Buy & Hold','BRRRR':'BRRRR','section8':'Section 8','flip':'Fix & Flip','STR':'STR','house-hack':'House Hack'}[s]||s;}
+function statL(s){return{uploaded:'Uploaded',prospect:'Prospect',analyzing:'Analyzing','offer-out':'Offer Out','under-contract':'Under Contract',deal:'Active Deal',monitoring:'Monitoring',archived:'Archived'}[s]||s;}
+function bgCls(s){return{uploaded:'bg-uploaded',prospect:'bg-prospect',analyzing:'bg-analyzing','offer-out':'bg-offer','under-contract':'bg-contract',deal:'bg-deal',monitoring:'bg-monitoring',archived:'bg-archived'}[s]||'bg-uploaded';}
+
+/* ─── SAMPLES ─── */
+const SAMPLES=[
+  mkProp({id:'s1',address:'1842 Peachtree Circle',city:'Atlanta',state:'GA',zip:'30309',type:'Duplex',units:2,beds:3,baths:2,sqft:2100,yearBuilt:1985,strategy:'buy-hold',status:'analyzing',source:'MLS',listPrice:285000,purchasePrice:275000,rent:1600,vacRate:8,mgmtPct:10,taxes:3200,ins:1600,maint:150,capex:175,downPct:25,rate:7.25,term:30,appRate:4,rentGr:3,motivScore:45,notes:'47 days on market, one price reduction. Good bones, cosmetic work needed.'}),
+  mkProp({id:'s2',address:'3901 Vine Street',city:'Memphis',state:'TN',zip:'38128',type:'SFR',units:1,beds:3,baths:1,sqft:1100,yearBuilt:1968,strategy:'BRRRR',status:'offer-out',source:'Wholesale',listPrice:62000,purchasePrice:58000,rent:1050,vacRate:10,mgmtPct:10,taxes:1200,ins:900,maint:100,capex:120,downPct:20,rate:12.0,term:30,arv:105000,rehab:22000,hmRate:12,hmPts:2,holdMo:6,appRate:3,rentGr:2.5,motivScore:78,notes:'Wholesaler deal. ARV validated at $105K. Rehab: kitchen, baths, flooring, roof patch.',aiGenerated:true}),
+  mkProp({id:'s3',address:'522 Highland Avenue',city:'Dallas',state:'TX',zip:'75214',type:'SFR',units:1,beds:4,baths:2,sqft:1850,yearBuilt:1998,strategy:'section8',status:'deal',source:'MLS',listPrice:320000,purchasePrice:315000,rent:2400,vacRate:5,mgmtPct:8,taxes:5800,ins:1800,maint:120,capex:160,downPct:25,rate:6.875,term:30,appRate:4.5,rentGr:3.5,motivScore:20,notes:'Active Section 8. HAP contract signed. Tenant pays $650, govt pays $1,750 directly.'}),
+  mkProp({id:'s4',address:'78 Maple Street',city:'Detroit',state:'MI',zip:'48201',type:'Triplex',units:3,beds:2,baths:1,sqft:2800,yearBuilt:1955,strategy:'BRRRR',status:'uploaded',source:'Off-Market / DFD',listPrice:48000,purchasePrice:48000,rent:850,vacRate:10,mgmtPct:10,taxes:1800,ins:1100,maint:150,capex:200,downPct:20,rate:12.0,term:30,arv:130000,rehab:38000,hmRate:12,hmPts:2,holdMo:6,appRate:2.5,rentGr:2,motivScore:82,notes:'Drove for dollars. Absentee owner out of state. Pre-foreclosure notice filed 60 days ago.',aiGenerated:true}),
+];
+
+/* ─── INIT ─── */
+async function init(){
+  try{
+    props=await loadAll();
+    if(props.length===0){for(const p of SAMPLES)await saveP(p);props=[...SAMPLES];}
+    for(const p of props)ddState[p.id]=await loadDD(p.id);
+  }catch(e){console.warn('Storage init failed:',e);props=[...SAMPLES];}
+  render();
+}
+init();
+</script>
+</body>
+</html>
